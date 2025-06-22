@@ -6,7 +6,7 @@
     "key.converter": "org.apache.kafka.connect.storage.StringConverter",
     "value.converter": "org.apache.kafka.connect.json.JsonConverter",
     "topics": "finish-line",
-    "connection.url": "jdbc:mariadb://db:3306/<CHANGEME>",
+    "connection.url": "jdbc:mariadb://db:3306/malstrek",
     "connection.user": "<CHANGEME>",
     "connection.password": "<CHANGEME>",
     "dialect.name": "",
