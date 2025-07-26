@@ -11,6 +11,18 @@ services:
       networks:
         - streamer_default
 
+    migrate:
+      build: .
+      depends_on:
+        - db
+      volumes:
+        - ./migrations:/migrations
+      command: ["migrate", "-database", "mysql://$MYSQL_USER:$MYSQL_PASSWORD@tcp(db:3306)/$MYSQL_DATABASE?multiStatements=true", "-path", "/migrations", "up"]
+      # tty: true
+      # stdin_open: true
+      networks:
+        - streamer_default
+
 volumes:
   mariadb_data:
 

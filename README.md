@@ -20,7 +20,7 @@ MYSQL_PASSWORD=<YOUR_USER_PASSWORD>
 ## Run
 
 ```bash
-docker compose up -d
+docker compose up --build -d
 ```
 
 Start bash prompt inside the container
