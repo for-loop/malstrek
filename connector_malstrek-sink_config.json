@@ -11,9 +11,9 @@
     "connection.password": "<CHANGEME>",
     "dialect.name": "",
     "insert.mode": "insert",
-    "table.name.format": "finishline",
+    "table.name.format": "finishers",
     "pk.mode": "record_key",
-    "pk.fields": "id",
+    "pk.fields": "timestamp",
     "auto.create": "true",
     "value.converter.schemas.enable": "true"
   }
