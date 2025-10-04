@@ -22,6 +22,31 @@ services:
       # stdin_open: true
       networks:
         - streamer_default
+    
+    metabase:
+      image: metabase/metabase:v0.56.8
+      container_name: metabase
+      hostname: metabase
+      volumes:
+        - /dev/urandom:/dev/random:ro
+      ports:
+        - 3000:3000
+      env_file: ".env"
+      networks:
+        - streamer_default
+      healthcheck:
+        test: curl --fail -I http://localhost:3000/api/health || exit 1
+        interval: 15s
+        timeout: 5s
+        retries: 5
+
+    postgres:
+      image: postgres:18.0
+      container_name: postgres
+      hostname: postgres
+      env_file: ".env"
+      networks:
+        - streamer_default
 
 volumes:
   mariadb_data:
