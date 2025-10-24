@@ -40,16 +40,19 @@ services:
         timeout: 5s
         retries: 5
 
-    postgres:
+    metabase-db:
       image: postgres:18.0
-      container_name: postgres
-      hostname: postgres
+      container_name: metabase-db
+      hostname: metabase-db
+      volumes:
+        - metabase_db_data:/var/lib/postgresql/data
       env_file: ".env"
       networks:
         - streamer_default
 
 volumes:
   mariadb_data:
+  metabase_db_data:
 
 networks:
   streamer_default:
