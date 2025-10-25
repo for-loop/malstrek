@@ -32,12 +32,12 @@ Create a question named "All Finishers"
 
     ```
 3. Click on Gear icon next to Visualization button
-4. Next to `duration`, click `...`
-    a. Under "Show the time", click on `HH:MM:SS`
-    b. Under "Time style", choose "24-hour clock"
-5. Next to `race_number`, click `...`
-    a. Under Separator style, choose "100000.00"
-    b. repeat for `finisher_id` and `bib_number`
+4. Next to `duration`, click `...`  
+    a. Under "Show the time", click on `HH:MM:SS`  
+    b. Under "Time style", choose "24-hour clock"  
+5. Next to `race_number`, click `...`  
+    a. Under Separator style, choose "100000.00"  
+    b. repeat for `finisher_id` and `bib_number`  
 6. Save as "All Finishers"
 
 Create a question named "All Finishers Descending"
@@ -52,13 +52,13 @@ Create a dashboard named "Malstrek Dashboard"
 1. Click on New button and select Dashboard
 2. Add "All Finishers Descending"
 3. Click on Filter icon and create a race number filter
-    a. Label: "Race Number"
-    b. Filter or parameter type: "Number"
-    c. Dropdown list
-        i. From another model or question
-        ii. Model or question to supply the values: "Race Numbers"
-        iii. Column to supply the values: "Race Number"
-    d. Set a Default value
-    e. Enable "Always require a value"
+    a. Label: "Race Number"  
+    b. Filter or parameter type: "Number"  
+    c. Dropdown list  
+        i. From another model or question  
+        ii. Model or question to supply the values: "Race Numbers"  
+        iii. Column to supply the values: "Race Number"  
+    d. Set a Default value  
+    e. Enable "Always require a value"  
 4. Click Done button
 5. Save as "Malstrek Dashboard"
