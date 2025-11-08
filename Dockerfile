@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.22.2
 
 RUN apk update && apk --no-cache add curl unzip
 
