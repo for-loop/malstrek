@@ -26,10 +26,20 @@ POSTGRES_DB=<METABASE_DATABASE_NAME>
 POSTGRES_PASSWORD=<METABASE_DATABASE_PASSWORD>
 ```
 
-## Run
+## Build
+
+Build images (Internet connection required)
 
 ```bash
-docker compose up --build -d
+docker compose build
+```
+
+## Run
+
+Run containers (offline OK)
+
+```bash
+docker compose up --no-build --pull=never -d
 ```
 
 Start bash prompt inside the container
