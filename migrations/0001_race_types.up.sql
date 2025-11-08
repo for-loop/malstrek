@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS race_types (
 INSERT INTO race_types 
     (type) 
 VALUES
-    ('Standard road'),
+    ('Standard Road'),
     ('Trail Runs'),
     ('Fun Runs / Novelty Races'),
     ('Track Events'),
