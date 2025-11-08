@@ -1,3 +1,5 @@
+USE malstrek;
+
 CREATE TABLE timezones (
     timezone_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     timezone VARCHAR(100) NOT NULL UNIQUE
