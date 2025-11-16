@@ -4,29 +4,42 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class ProducerTest {
+    private static final String EMPTY_STRING = "";
+    private static final String DOUBLE_WHITESPACE_STRING = "  ";
+    private static final String NEWLINE_STRING = "\n";
+    private static final String TAB_STRING = "\t";
+
     @Test void parseStringIntegerReturnsJsonObjectNullWhenGivenNull() {
         Producer classUnderTest = new Producer();
         assertEquals(JSONObject.NULL, classUnderTest.parseStringInteger(null), "parseStringInteger should return JSONObject.NULL when given null");
     }
 
-    @Test void parseStringIntegerReturnsJsonObjectNullWhenGivenEmptyStringOrWhitespace() {
+    @ParameterizedTest
+    @ValueSource(strings = {EMPTY_STRING, DOUBLE_WHITESPACE_STRING, NEWLINE_STRING, TAB_STRING})
+    void parseStringIntegerReturnsJsonObjectNullWhenGivenEmptyStringOrWhitespace(String integerString) {
         Producer classUnderTest = new Producer();
-        assertEquals(JSONObject.NULL, classUnderTest.parseStringInteger(""), "parseStringInteger should return JSONObject.NULL when given empty string");
-        assertEquals(JSONObject.NULL, classUnderTest.parseStringInteger("   "), "parseStringInteger should return JSONObject.NULL when given whitespace string");
+        assertEquals(JSONObject.NULL, classUnderTest.parseStringInteger(integerString), "parseStringInteger should return JSONObject.NULL when given empty string or whitespace");
     }
 
-    @Test void parseStringIntegerReturnsIntegerWhenGivenValidIntegerString() {
+    @ParameterizedTest
+    @ValueSource(strings = {"42", "-7", "0"})
+    void parseStringIntegerReturnsIntegerWhenGivenValidIntegerString(String integerString) {
+        int expected = Integer.parseInt(integerString);
         Producer classUnderTest = new Producer();
-        assertEquals(42, classUnderTest.parseStringInteger("42"), "parseStringInteger should return Integer 42 when given string '42'");
-        assertEquals(-7, classUnderTest.parseStringInteger("-7"), "parseStringInteger should return Integer -7 when given string '-7'");
+
+        Object actual = classUnderTest.parseStringInteger(integerString);
+
+        assertEquals(expected, actual, "parseStringInteger should return Integer " + expected + " when given string " + integerString);
     }
 
-    @Test void parseStringIntegerReturnsJsonObjectNullWhenGivenInvalidIntegerString() {
+    @ParameterizedTest
+    @ValueSource(strings = {"abc", "12.34", "123abc", DOUBLE_WHITESPACE_STRING + "one" + DOUBLE_WHITESPACE_STRING, "!"})
+    void parseStringIntegerReturnsJsonObjectNullWhenGivenInvalidIntegerString(String integerString) {
         Producer classUnderTest = new Producer();
-        assertEquals(JSONObject.NULL, classUnderTest.parseStringInteger("abc"), "parseStringInteger should return JSONObject.NULL when given non-integer string");
-        assertEquals(JSONObject.NULL, classUnderTest.parseStringInteger("12.34"), "parseStringInteger should return JSONObject.NULL when given decimal string");
-        assertEquals(JSONObject.NULL, classUnderTest.parseStringInteger("123abc"), "parseStringInteger should return JSONObject.NULL when given mixed string");
+        assertEquals(JSONObject.NULL, classUnderTest.parseStringInteger(integerString), "parseStringInteger should return JSONObject.NULL when given non-integer string");
     }
 }
