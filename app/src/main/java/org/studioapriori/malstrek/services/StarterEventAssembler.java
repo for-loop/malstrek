@@ -1,8 +1,14 @@
-package org.studioapriori.malstrek.model.telemetry;
+package org.studioapriori.malstrek.services;
 
 import java.util.Arrays;
+import org.studioapriori.malstrek.model.telemetry.FieldDefinition;
+import org.studioapriori.malstrek.model.telemetry.Payload;
+import org.studioapriori.malstrek.model.telemetry.PayloadWithDestination;
+import org.studioapriori.malstrek.model.telemetry.Schema;
+import org.studioapriori.malstrek.model.telemetry.StarterData;
+import org.studioapriori.malstrek.model.telemetry.TelemetryData;
 
-public class StarterModelAssembler extends ModelAssembler {
+public class StarterEventAssembler extends EventAssembler {
     public Integer bib_number;
 
     public static final Schema STARTER_SCHEMA = new Schema(
@@ -16,7 +22,7 @@ public class StarterModelAssembler extends ModelAssembler {
         1
     );
 
-    public StarterModelAssembler(String topic, int race_number, long timestamp) {
+    public StarterEventAssembler(String topic, int race_number, long timestamp) {
         super(topic, race_number, timestamp);
     }
 

@@ -1,20 +1,22 @@
-package org.studioapriori.malstrek.model.telemetry;
+package org.studioapriori.malstrek.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.Test;
+import org.studioapriori.malstrek.model.telemetry.FinisherData;
+import org.studioapriori.malstrek.model.telemetry.PayloadWithDestination;
 
-public class FinisherModelAssemblerTest extends ModelAssemblerTest {
+public class FinisherEventAssemblerTest extends EventAssemblerTest {
 
     private final Integer BIB_NUMBER = 456;
 
-    protected ModelAssembler createAssembler(String topic, int raceNumber, long timestamp) {
-        return new FinisherModelAssembler(topic, raceNumber, BIB_NUMBER, timestamp);
+    protected EventAssembler createAssembler(String topic, int raceNumber, long timestamp) {
+        return new FinisherEventAssembler(topic, raceNumber, BIB_NUMBER, timestamp);
     }
 
     @Test void testAssembleReturnsNullBibNumberWhenBibNumberIsNull() {
-        ModelAssembler assembler = new FinisherModelAssembler(
+        EventAssembler assembler = new FinisherEventAssembler(
             TOPIC,
             RACE_NUMBER,
             null,
@@ -27,7 +29,7 @@ public class FinisherModelAssemblerTest extends ModelAssemblerTest {
     }
 
     @Test void testAssembleReturnsPayloadWithDestination() {
-        ModelAssembler assembler = createAssembler(TOPIC, RACE_NUMBER, TIMESTAMP);
+        EventAssembler assembler = createAssembler(TOPIC, RACE_NUMBER, TIMESTAMP);
 
         PayloadWithDestination actual = assembler.assemble();
         FinisherData data = (FinisherData) actual.payload().payload();
