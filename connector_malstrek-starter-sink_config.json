@@ -1,0 +1,20 @@
+{
+  "name": "malstrek-starter-sink",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+    "tasks.max": "1",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "topics": "start-line",
+    "connection.url": "jdbc:mariadb://db:3306/malstrek",
+    "connection.user": "<CHANGEME>",
+    "connection.password": "<CHANGEME>",
+    "dialect.name": "",
+    "insert.mode": "insert",
+    "table.name.format": "starters",
+    "pk.mode": "none",
+    "pk.fields": "",
+    "auto.create": "true",
+    "value.converter.schemas.enable": "true"
+  }
+}
