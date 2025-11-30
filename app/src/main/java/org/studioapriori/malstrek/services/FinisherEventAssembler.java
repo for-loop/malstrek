@@ -1,8 +1,14 @@
-package org.studioapriori.malstrek.model.telemetry;
+package org.studioapriori.malstrek.services;
 
 import java.util.Arrays;
+import org.studioapriori.malstrek.model.telemetry.FieldDefinition;
+import org.studioapriori.malstrek.model.telemetry.FinisherData;
+import org.studioapriori.malstrek.model.telemetry.Payload;
+import org.studioapriori.malstrek.model.telemetry.PayloadWithDestination;
+import org.studioapriori.malstrek.model.telemetry.Schema;
+import org.studioapriori.malstrek.model.telemetry.TelemetryData;
 
-public class FinisherModelAssembler extends ModelAssembler {
+public class FinisherEventAssembler extends EventAssembler {
     public Integer bib_number;
 
     public static final Schema FINISHER_SCHEMA = new Schema(
@@ -17,7 +23,7 @@ public class FinisherModelAssembler extends ModelAssembler {
         1
     );
 
-    public FinisherModelAssembler(String topic, int race_number, Integer bib_number, long timestamp) {
+    public FinisherEventAssembler(String topic, int race_number, Integer bib_number, long timestamp) {
         super(topic, race_number, timestamp);
         this.bib_number = bib_number;
     }

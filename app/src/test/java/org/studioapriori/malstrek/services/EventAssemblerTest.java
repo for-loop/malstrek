@@ -1,12 +1,13 @@
-package org.studioapriori.malstrek.model.telemetry;
+package org.studioapriori.malstrek.services;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.studioapriori.malstrek.model.telemetry.PayloadWithDestination;
 import static org.studioapriori.malstrek.Constants.*;
 
-public abstract class ModelAssemblerTest {
+public abstract class EventAssemblerTest {
 
     protected final String TOPIC = "topic";
     protected final int RACE_NUMBER = 123;
@@ -15,7 +16,7 @@ public abstract class ModelAssemblerTest {
     protected final int RACE_NUMBER_ZERO = 0;
 
     // Subclasses implement this factory method with their own constructor signature
-    protected abstract ModelAssembler createAssembler(String topic, int raceNumber, long timestamp);
+    protected abstract EventAssembler createAssembler(String topic, int raceNumber, long timestamp);
 
     @Test void testCtrThrowsWhenTopicIsNull() {
         assertThrows(IllegalArgumentException.class, () -> {

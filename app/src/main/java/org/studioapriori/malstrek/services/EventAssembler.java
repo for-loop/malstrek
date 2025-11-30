@@ -1,11 +1,13 @@
-package org.studioapriori.malstrek.model.telemetry;
+package org.studioapriori.malstrek.services;
 
-public abstract class ModelAssembler {
+import org.studioapriori.malstrek.model.telemetry.PayloadWithDestination;
+
+public abstract class EventAssembler {
     public String topic;
     public int race_number;
     public long timestamp;
 
-    public ModelAssembler(String topic, int race_number, long timestamp) {
+    public EventAssembler(String topic, int race_number, long timestamp) {
         if (topic == null || topic.isBlank())
             throw new IllegalArgumentException("Topic cannot be null or blank.");
         
