@@ -6,7 +6,7 @@ public class IntegerStringParser implements Parser<String, Integer> {
             return null;
 
         try {
-            return Integer.parseInt(integerString);
+            return Integer.parseInt(integerString.trim());
         } catch (NumberFormatException e) {
             return null;
         }
