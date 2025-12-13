@@ -27,7 +27,7 @@ public class IntegerStringParserTest {
         int expected = Integer.parseInt(integerString);
         Parser<String, Integer> classUnderTest = new IntegerStringParser();
 
-        Object actual = classUnderTest.parse(integerString);
+        Integer actual = classUnderTest.parse(integerString);
 
         assertEquals(expected, actual, "parseStringInteger should return Integer " + expected + " when given string " + integerString);
     }
@@ -37,5 +37,19 @@ public class IntegerStringParserTest {
     void parseStringIntegerReturnsNullWhenGivenInvalidIntegerString(String integerString) {
         Parser<String, Integer> classUnderTest = new IntegerStringParser();
         assertEquals(null, classUnderTest.parse(integerString), "parseStringInteger should return null when given non-integer string");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {DOUBLE_WHITESPACE_STRING + "56" + DOUBLE_WHITESPACE_STRING,
+                            TAB_STRING + "99" + TAB_STRING,
+                            NEWLINE_STRING + "0" + NEWLINE_STRING})
+    void parseStringIntegerTrimsWhitespaceAndReturnsInteger(String integerString) {
+        String trimmedString = integerString.trim();
+        int expected = Integer.parseInt(trimmedString);
+        Parser<String, Integer> classUnderTest = new IntegerStringParser(); 
+        
+        Integer actual = classUnderTest.parse(integerString);
+        
+        assertEquals(expected, actual, "parseStringInteger should return Integer " + expected + " when given string with whitespace " + integerString);
     }
 }
