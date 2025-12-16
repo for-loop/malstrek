@@ -14,12 +14,22 @@ plugins {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+
+    maven {
+        url = uri("https://packages.confluent.io/maven")
+    }
 }
 
 dependencies {
     // This dependency is used by the application.
     implementation(libs.guava)
+    implementation("org.slf4j:slf4j-nop:2.0.3")
+    implementation("org.apache.kafka:kafka-clients:3.3.1")
     implementation("org.json:json:20240303")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
+    
+    testImplementation("org.mockito:mockito-core:5.2.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.2.0")
 }
 
 testing {
