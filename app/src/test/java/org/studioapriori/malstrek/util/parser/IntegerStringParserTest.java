@@ -1,4 +1,4 @@
-package org.studioapriori.malstrek;
+package org.studioapriori.malstrek.util.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

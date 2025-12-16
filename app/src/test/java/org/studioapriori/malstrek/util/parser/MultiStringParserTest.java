@@ -1,4 +1,4 @@
-package org.studioapriori.malstrek;
+package org.studioapriori.malstrek.util.parser;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
