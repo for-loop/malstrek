@@ -26,6 +26,14 @@ POSTGRES_DB=<METABASE_DATABASE_NAME>
 POSTGRES_PASSWORD=<METABASE_DATABASE_PASSWORD>
 ```
 
+Add the following to the `.zshrc` or `.bashrc`
+
+```bash
+export KAFKA_BOOTSTRAP_SERVERS=<KAFKA_BOOTSTRAP_SERVER>:9092
+```
+
+> For local development, set it to `0.0.0.0:9092`
+
 ## Build
 
 Build images (Internet connection required)
