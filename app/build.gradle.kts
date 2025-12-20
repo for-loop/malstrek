@@ -6,6 +6,8 @@
  * This project uses @Incubating APIs which are subject to change.
  */
 
+import org.gradle.api.tasks.JavaExec
+
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
@@ -51,5 +53,9 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "org.example.App"
+    mainClass = "org.studioapriori.malstrek.App"
+}
+
+tasks.getByName("run", JavaExec::class) {
+    standardInput = System.`in`
 }
