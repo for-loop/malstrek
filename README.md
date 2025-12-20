@@ -90,7 +90,7 @@ docker compose down
 
 ## Run the console application within VS Code
 
-In the VS Code Terminal,
+In the Terminal,
 
 ```bash
 ./gradlew run
