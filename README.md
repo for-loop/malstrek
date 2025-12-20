@@ -88,6 +88,16 @@ docker compose down
 
 ---
 
+## Run the console application within VS Code
+
+In the VS Code Terminal,
+
+```bash
+./gradlew run
+```
+
+---
+
 ## Dashboard
 
 Access the dashboard
