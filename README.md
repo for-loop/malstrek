@@ -26,7 +26,7 @@ POSTGRES_DB=<METABASE_DATABASE_NAME>
 POSTGRES_PASSWORD=<METABASE_DATABASE_PASSWORD>
 ```
 
-Add the following to the `.zshrc` or `.bashrc`
+Add the following to the `.zshrc` or `.bashrc` (if running the non-containerized app)
 
 ```bash
 export KAFKA_BOOTSTRAP_SERVERS=<KAFKA_BOOTSTRAP_SERVER>:9092
@@ -44,10 +44,16 @@ docker compose build
 
 ## Run
 
-Run containers (offline OK)
+Run background containers (offline OK)
 
 ```bash
-docker compose up --no-build --pull=never -d
+docker compose up db migrate metabase metabase-db --no-build --pull=never -d
+```
+
+Run the app
+
+```bash
+docker compose run --rm malstrek-app
 ```
 
 Start bash prompt inside the container
