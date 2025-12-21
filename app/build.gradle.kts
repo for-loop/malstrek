@@ -11,6 +11,8 @@ import org.gradle.api.tasks.JavaExec
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+    // Shadow plugin to create fat JAR with all dependencies
+    id("com.gradleup.shadow") version "9.3.0"
 }
 
 repositories {
@@ -53,7 +55,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "org.studioapriori.malstrek.App"
+    mainClass.set("org.studioapriori.malstrek.App")
 }
 
 tasks.getByName("run", JavaExec::class) {

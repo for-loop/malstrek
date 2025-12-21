@@ -12,17 +12,35 @@ services:
         - streamer_default
 
     migrate:
-      build: .
+      build: 
+        context: .
+        dockerfile: Dockerfile
+        target: migrate_tool
+      container_name: migrate
       depends_on:
         - db
       volumes:
         - ./migrations:/migrations
       command: ["migrate", "-database", "mysql://$MYSQL_USER:$MYSQL_PASSWORD@tcp(db:3306)/$MYSQL_DATABASE?multiStatements=true", "-path", "/migrations", "up"]
-      # tty: true
-      # stdin_open: true
       networks:
         - streamer_default
     
+    malstrek-app:
+      build: 
+        context: .
+        dockerfile: Dockerfile
+        target: java_runner
+      depends_on:
+        - db
+        - migrate
+      ports:
+        - "8080:8080"
+      env_file: ".env"
+      networks:
+        - streamer_default
+      environment:
+        KAFKA_BOOTSTRAP_SERVERS: broker:29092
+
     metabase:
       image: metabase/metabase:v0.56.8
       container_name: metabase
