@@ -44,11 +44,11 @@ class RaceEventProducerTest {
     }
 
     private RaceEvent createTestEvent() {
-        return new RaceEvent(TOPIC, TIMESTAMP, RACE_NUMBER, AVRO_RECORD);
+        return new RaceEvent(TOPIC, TIMESTAMP, AVRO_RECORD);
     }
 
     private RaceEvent createTestEvent(long timestamp) {
-        return new RaceEvent(TOPIC, timestamp, RACE_NUMBER, AVRO_RECORD);
+        return new RaceEvent(TOPIC, timestamp, AVRO_RECORD);
     }
 
     @Test

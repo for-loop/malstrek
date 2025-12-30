@@ -8,7 +8,6 @@ import org.apache.avro.specific.SpecificRecord;
 public record RaceEvent(
     String topic,
     long timestamp,
-    int raceNumber,
     SpecificRecord avroRecord
 ) {
 }

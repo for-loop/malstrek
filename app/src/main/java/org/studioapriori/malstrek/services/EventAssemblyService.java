@@ -14,7 +14,6 @@ public class EventAssemblyService {
         return new RaceEvent(
             "start-line",
             timestamp,
-            raceNumber,
             Starter.newBuilder()
                 .setRaceNumber(raceNumber)
                 .setTimestamp(timestamp)
@@ -26,7 +25,6 @@ public class EventAssemblyService {
         return new RaceEvent(
             "finish-line",
             timestamp,
-            raceNumber,
             Finisher.newBuilder()
                 .setRaceNumber(raceNumber)
                 .setBibNumber(bibNumber)
