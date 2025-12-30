@@ -24,7 +24,6 @@ class RaceEventProducerTest {
     private static final String TOPIC = "test-topic";
     private static final long TIMESTAMP = 1762883020000L;
     private static final int RACE_NUMBER = 2028;
-    private static final String JSON_STRING = "{\"raceNumber\":2028}";
     private static final SpecificRecord AVRO_RECORD = Starter.newBuilder()
             .setDeleted(false)
             .setRaceNumber(RACE_NUMBER)
@@ -45,11 +44,11 @@ class RaceEventProducerTest {
     }
 
     private RaceEvent createTestEvent() {
-        return new RaceEvent(TOPIC, TIMESTAMP, RACE_NUMBER, JSON_STRING, AVRO_RECORD);
+        return new RaceEvent(TOPIC, TIMESTAMP, RACE_NUMBER, AVRO_RECORD);
     }
 
     private RaceEvent createTestEvent(long timestamp) {
-        return new RaceEvent(TOPIC, timestamp, RACE_NUMBER, JSON_STRING, AVRO_RECORD);
+        return new RaceEvent(TOPIC, timestamp, RACE_NUMBER, AVRO_RECORD);
     }
 
     @Test

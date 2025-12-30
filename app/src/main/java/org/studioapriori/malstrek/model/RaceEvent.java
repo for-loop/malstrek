@@ -9,7 +9,6 @@ public record RaceEvent(
     String topic,
     long timestamp,
     int raceNumber,
-    String jsonString,
     SpecificRecord avroRecord
 ) {
 }

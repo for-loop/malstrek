@@ -106,7 +106,7 @@ public class RaceEventController {
         producer.sendEvent(
             event,
             (raceEvent) -> 
-                ui.displayEvent(raceEvent.topic(), raceEvent.raceNumber(), raceEvent.timestamp(), raceEvent.jsonString())
+                ui.displayEvent(raceEvent.topic(), raceEvent.raceNumber(), raceEvent.timestamp(), raceEvent.avroRecord().toString())
         );
     }
 }
