@@ -54,7 +54,6 @@ class RaceEventControllerTest {
             STARTER_TOPIC, 
             STARTER_TIMESTAMP, 
             RACE_NUMBER, 
-            "{\"type\":\"starter\"}", 
             Starter.newBuilder()
                 .setDeleted(false)
                 .setRaceNumber(RACE_NUMBER)
@@ -64,12 +63,10 @@ class RaceEventControllerTest {
     }
 
     private RaceEvent createFinisherEvent(Integer bibNumber) {
-        String json = bibNumber != null ? "{\"bib\":" + bibNumber + "}" : "{\"bib\":null}";
         return new RaceEvent(
             FINISHER_TOPIC, 
             FINISHER_TIMESTAMP, 
             RACE_NUMBER, 
-            json, 
             Finisher.newBuilder()
                 .setDeleted(false)
                 .setRaceNumber(RACE_NUMBER)
@@ -133,7 +130,7 @@ class RaceEventControllerTest {
             starterEvent.topic(),
             starterEvent.raceNumber(),
             starterEvent.timestamp(),
-            starterEvent.jsonString()
+            starterEvent.avroRecord().toString()
         );
     }
 

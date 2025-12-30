@@ -45,16 +45,16 @@ class EventAssemblyServiceTest {
     }
 
     @Test
-    void assembleStarterEvent_jsonIsValidAndNotEmpty() {
+    void assembleStarterEvent_avroRecordIsValidAndNotEmpty() {
         RaceEvent event = service.assembleStarterEvent(RACE_NUMBER, TIMESTAMP);
 
-        // Verify JSON is not null and not empty
-        assertNotNull(event.jsonString());
-        assertFalse(event.jsonString().isEmpty());
+        // Verify Avro record is not null and not empty
+        assertNotNull(event.avroRecord());
+        assertFalse(event.avroRecord().toString().isEmpty());
 
         // Verify it's valid JSON by parsing it
         ObjectMapper mapper = new ObjectMapper();
-        assertDoesNotThrow(() -> mapper.readTree(event.jsonString()));
+        assertDoesNotThrow(() -> mapper.readTree(event.avroRecord().toString()));
     }
 
     @Test
@@ -104,16 +104,16 @@ class EventAssemblyServiceTest {
     }
 
     @Test
-    void assembleFinisherEvent_jsonIsValidAndNotEmpty() {
+    void assembleFinisherEvent_avroRecordIsValidAndNotEmpty() {
         RaceEvent event = service.assembleFinisherEvent(RACE_NUMBER, BIB_NUMBER, TIMESTAMP);
 
-        // Verify JSON is not null and not empty
-        assertNotNull(event.jsonString());
-        assertFalse(event.jsonString().isEmpty());
+        // Verify Avro Record is not null and not empty
+        assertNotNull(event.avroRecord());
+        assertFalse(event.avroRecord().toString().isEmpty());
 
         // Verify it's valid JSON by parsing it
         ObjectMapper mapper = new ObjectMapper();
-        assertDoesNotThrow(() -> mapper.readTree(event.jsonString()));
+        assertDoesNotThrow(() -> mapper.readTree(event.avroRecord().toString()));
     }
 
     @Test
@@ -148,7 +148,7 @@ class EventAssemblyServiceTest {
         assertEquals("finish-line", event.topic());
         assertEquals(TIMESTAMP, event.timestamp());
         assertEquals(RACE_NUMBER, event.raceNumber());
-        assertNotNull(event.jsonString());
-        assertFalse(event.jsonString().isEmpty());
+        assertNotNull(event.avroRecord());
+        assertFalse(event.avroRecord().toString().isEmpty());
     }
 }
