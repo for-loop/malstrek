@@ -53,7 +53,6 @@ class RaceEventControllerTest {
         return new RaceEvent(
             STARTER_TOPIC, 
             STARTER_TIMESTAMP, 
-            RACE_NUMBER, 
             Starter.newBuilder()
                 .setDeleted(false)
                 .setRaceNumber(RACE_NUMBER)
@@ -66,7 +65,6 @@ class RaceEventControllerTest {
         return new RaceEvent(
             FINISHER_TOPIC, 
             FINISHER_TIMESTAMP, 
-            RACE_NUMBER, 
             Finisher.newBuilder()
                 .setDeleted(false)
                 .setRaceNumber(RACE_NUMBER)

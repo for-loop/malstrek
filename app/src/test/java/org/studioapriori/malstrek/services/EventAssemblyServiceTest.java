@@ -3,6 +3,8 @@ package org.studioapriori.malstrek.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.studioapriori.malstrek.avro.Finisher;
+import org.studioapriori.malstrek.avro.Starter;
 import org.studioapriori.malstrek.model.RaceEvent;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,13 +37,14 @@ class EventAssemblyServiceTest {
         RaceEvent event = service.assembleStarterEvent(RACE_NUMBER, TIMESTAMP);
 
         assertEquals(TIMESTAMP, event.timestamp());
+        assertEquals(TIMESTAMP, ((Starter) event.avroRecord()).getTimestamp());
     }
 
     @Test
     void assembleStarterEvent_returnsRaceEventWithCorrectRaceNumber() {
         RaceEvent event = service.assembleStarterEvent(RACE_NUMBER, TIMESTAMP);
 
-        assertEquals(RACE_NUMBER, event.raceNumber());
+        assertEquals(RACE_NUMBER, ((Starter) event.avroRecord()).getRaceNumber());
     }
 
     @Test
@@ -58,14 +61,6 @@ class EventAssemblyServiceTest {
     }
 
     @Test
-    void assembleStarterEvent_raceEventContainsRaceNumber() {
-        RaceEvent event = service.assembleStarterEvent(RACE_NUMBER, TIMESTAMP);
-
-        // Verify race number is stored in the RaceEvent record itself
-        assertEquals(RACE_NUMBER, event.raceNumber());
-    }
-
-    @Test
     void assembleStarterEvent_multipleCallsProduceDifferentEvents() {
         long timestamp1 = TIMESTAMP;
         long timestamp2 = TIMESTAMP + 1000;
@@ -77,7 +72,7 @@ class EventAssemblyServiceTest {
         assertNotEquals(event1.timestamp(), event2.timestamp());
         // But same topic and race number
         assertEquals(event1.topic(), event2.topic());
-        assertEquals(event1.raceNumber(), event2.raceNumber());
+        assertEquals(((Starter) event1.avroRecord()).getRaceNumber(), ((Starter) event2.avroRecord()).getRaceNumber());
     }
 
     // Tests for assembleFinisherEvent
@@ -94,13 +89,14 @@ class EventAssemblyServiceTest {
         RaceEvent event = service.assembleFinisherEvent(RACE_NUMBER, BIB_NUMBER, TIMESTAMP);
 
         assertEquals(TIMESTAMP, event.timestamp());
+        assertEquals(TIMESTAMP, ((Finisher) event.avroRecord()).getTimestamp());
     }
 
     @Test
     void assembleFinisherEvent_returnsRaceEventWithCorrectRaceNumber() {
         RaceEvent event = service.assembleFinisherEvent(RACE_NUMBER, BIB_NUMBER, TIMESTAMP);
 
-        assertEquals(RACE_NUMBER, event.raceNumber());
+        assertEquals(RACE_NUMBER, ((Finisher) event.avroRecord()).getRaceNumber());
     }
 
     @Test
@@ -117,14 +113,6 @@ class EventAssemblyServiceTest {
     }
 
     @Test
-    void assembleFinisherEvent_raceEventContainsRaceNumber() {
-        RaceEvent event = service.assembleFinisherEvent(RACE_NUMBER, BIB_NUMBER, TIMESTAMP);
-
-        // Verify race number is stored in the RaceEvent record itself
-        assertEquals(RACE_NUMBER, event.raceNumber());
-    }
-
-    @Test
     void assembleFinisherEvent_multipleCallsProduceDifferentEvents() {
         long timestamp1 = TIMESTAMP;
         long timestamp2 = TIMESTAMP + 1000;
@@ -136,7 +124,7 @@ class EventAssemblyServiceTest {
         assertNotEquals(event1.timestamp(), event2.timestamp());
         // But same topic and race number
         assertEquals(event1.topic(), event2.topic());
-        assertEquals(event1.raceNumber(), event2.raceNumber());
+        assertEquals(((Finisher) event1.avroRecord()).getRaceNumber(), ((Finisher) event2.avroRecord()).getRaceNumber());
     }
 
     @Test
@@ -147,7 +135,7 @@ class EventAssemblyServiceTest {
         assertNotNull(event);
         assertEquals("finish-line", event.topic());
         assertEquals(TIMESTAMP, event.timestamp());
-        assertEquals(RACE_NUMBER, event.raceNumber());
+        assertEquals(RACE_NUMBER, ((Finisher) event.avroRecord()).getRaceNumber());
         assertNotNull(event.avroRecord());
         assertFalse(event.avroRecord().toString().isEmpty());
     }
