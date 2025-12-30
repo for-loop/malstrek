@@ -3,6 +3,8 @@ package org.studioapriori.malstrek.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.studioapriori.malstrek.model.RaceEvent;
 import org.studioapriori.malstrek.model.telemetry.PayloadWithDestination;
+import org.studioapriori.malstrek.avro.Starter;
+import org.studioapriori.malstrek.avro.Finisher;
 
 /**
  * Wraps event assembly and serialization logic.
@@ -27,7 +29,11 @@ public class EventAssemblyService {
             payload.topic(),
             timestamp,
             raceNumber,
-            jsonString
+            jsonString,
+            Starter.newBuilder()
+                .setRaceNumber(raceNumber)
+                .setTimestamp(timestamp)
+                .build()
         );
     }
 
@@ -44,7 +50,12 @@ public class EventAssemblyService {
             payload.topic(),
             timestamp,
             raceNumber,
-            jsonString
+            jsonString,
+            Finisher.newBuilder()
+                .setRaceNumber(raceNumber)
+                .setBibNumber(bibNumber)
+                .setTimestamp(timestamp)
+                .build()
         );
     }
 

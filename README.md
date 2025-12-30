@@ -24,6 +24,7 @@ MB_DB_HOST=metabase-db
 POSTGRES_USER=<METABASE_DATABASE_USER>
 POSTGRES_DB=<METABASE_DATABASE_NAME>
 POSTGRES_PASSWORD=<METABASE_DATABASE_PASSWORD>
+KAFKA_SCHEMA_REGISTRY_URL=http://schema-registry:8081
 ```
 
 Add the following to the `.zshrc` or `.bashrc` (if running the non-containerized app)
@@ -33,6 +34,26 @@ export KAFKA_BOOTSTRAP_SERVERS=<KAFKA_BOOTSTRAP_SERVER>:9092
 ```
 
 > For local development, set it to `0.0.0.0:9092`
+
+### Register schema
+
+```bash
+curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" \
+     --data "{\"schema\": $(jq -Rs . ./app/src/main/avro/start-line.avsc)}" \
+     http://localhost:8081/subjects/start-line-value/versions
+```
+
+```bash
+curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" \
+     --data "{\"schema\": $(jq -Rs . ./app/src/main/avro/finish-line.avsc)}" \
+     http://localhost:8081/subjects/finish-line-value/versions
+```
+
+## Kafka Connect Config
+
+See Configuration Reference for [JDBC Sink Connector](https://docs.confluent.io/kafka-connectors/jdbc/current/sink-connector/sink_config_options.html)
+
+---
 
 ## Build
 
