@@ -1,0 +1,11 @@
+{
+    "type": "record",
+    "namespace": "org.studioapriori.malstrek.avro",
+    "name": "Finisher",
+    "fields": [
+        {"name": "race_number", "type": "int"},
+        {"name": "bib_number", "type": ["null", "int"], "default": null},
+        {"name": "timestamp", "type": "long"},
+        {"name": "deleted", "type": "boolean", "default": false}
+    ]
+}

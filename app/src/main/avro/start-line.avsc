@@ -1,0 +1,10 @@
+{
+    "type": "record",
+    "namespace": "org.studioapriori.malstrek.avro",
+    "name": "Starter",
+    "fields": [
+        {"name": "race_number", "type": "int"},
+        {"name": "timestamp", "type": "long"},
+        {"name": "deleted", "type": "boolean", "default": false}
+    ]
+}

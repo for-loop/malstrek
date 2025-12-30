@@ -13,6 +13,7 @@ plugins {
     application
     // Shadow plugin to create fat JAR with all dependencies
     id("com.gradleup.shadow") version "9.3.0"
+    id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
 }
 
 repositories {
@@ -31,7 +32,9 @@ dependencies {
     implementation("org.apache.kafka:kafka-clients:3.3.1")
     implementation("org.json:json:20240303")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
-    
+    implementation("io.confluent:kafka-avro-serializer:7.9.0")
+    implementation("org.apache.avro:avro:1.11.3")
+
     testImplementation("org.mockito:mockito-core:5.2.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.2.0")
 }

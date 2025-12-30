@@ -1,4 +1,5 @@
 package org.studioapriori.malstrek.model;
+import org.apache.avro.specific.SpecificRecord;
 
 /**
  * Data class representing a race event ready to send to Kafka.
@@ -8,6 +9,7 @@ public record RaceEvent(
     String topic,
     long timestamp,
     int raceNumber,
-    String jsonString
+    String jsonString,
+    SpecificRecord avroRecord
 ) {
 }

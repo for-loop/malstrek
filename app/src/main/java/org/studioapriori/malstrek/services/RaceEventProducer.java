@@ -4,8 +4,11 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
+import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.studioapriori.malstrek.model.RaceEvent;
 import static org.apache.kafka.clients.producer.ProducerConfig.*;
+import org.apache.avro.specific.SpecificRecord;
+import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 
 import java.util.Properties;
 
@@ -14,7 +17,7 @@ import java.util.Properties;
  * Handles event sending and producer lifecycle.
  */
 public class RaceEventProducer {
-    private final Producer<String, String> producer;
+    private final Producer<String, SpecificRecord> producer;
 
     /**
      * Creates a RaceEventProducer with the provided Kafka producer.
@@ -22,7 +25,7 @@ public class RaceEventProducer {
      *
      * @param producer the Kafka producer instance
      */
-    public RaceEventProducer(Producer<String, String> producer) {
+    public RaceEventProducer(Producer<String, SpecificRecord> producer) {
         this.producer = producer;
     }
 
@@ -38,8 +41,9 @@ public class RaceEventProducer {
             {
                 put(BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
                 put(KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getCanonicalName());
-                put(VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getCanonicalName());
+                put(VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getCanonicalName());
                 put(ACKS_CONFIG, "all");
+                put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, System.getenv("KAFKA_SCHEMA_REGISTRY_URL") != null ? System.getenv("KAFKA_SCHEMA_REGISTRY_URL") : "http://localhost:8081");
             }
         };
         return new RaceEventProducer(new KafkaProducer<>(props));
@@ -52,12 +56,12 @@ public class RaceEventProducer {
      * @param callback the callback to invoke on completion (success or error)
      */
     public void sendEvent(RaceEvent event, EventCallback callback) {
-        ProducerRecord<String, String> record = new ProducerRecord<>(
+        ProducerRecord<String, SpecificRecord> record = new ProducerRecord<>(
             event.topic(),
             null,
             event.timestamp(),
             null,
-            event.jsonString()
+            event.avroRecord()
         );
 
         producer.send(record, (producerEvent, ex) -> {

@@ -1,5 +1,6 @@
 package org.studioapriori.malstrek.services;
 
+import org.apache.avro.specific.SpecificRecord;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.studioapriori.malstrek.avro.Starter;
 import org.studioapriori.malstrek.model.RaceEvent;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,9 +25,14 @@ class RaceEventProducerTest {
     private static final long TIMESTAMP = 1762883020000L;
     private static final int RACE_NUMBER = 2028;
     private static final String JSON_STRING = "{\"raceNumber\":2028}";
+    private static final SpecificRecord AVRO_RECORD = Starter.newBuilder()
+            .setDeleted(false)
+            .setRaceNumber(RACE_NUMBER)
+            .setTimestamp(TIMESTAMP)
+            .build();
 
     @Mock
-    private Producer<String, String> mockProducer;
+    private Producer<String, SpecificRecord> mockProducer;
 
     @Mock
     private EventCallback mockCallback;
@@ -38,21 +45,21 @@ class RaceEventProducerTest {
     }
 
     private RaceEvent createTestEvent() {
-        return new RaceEvent(TOPIC, TIMESTAMP, RACE_NUMBER, JSON_STRING);
+        return new RaceEvent(TOPIC, TIMESTAMP, RACE_NUMBER, JSON_STRING, AVRO_RECORD);
     }
 
     private RaceEvent createTestEvent(long timestamp) {
-        return new RaceEvent(TOPIC, timestamp, RACE_NUMBER, JSON_STRING);
+        return new RaceEvent(TOPIC, timestamp, RACE_NUMBER, JSON_STRING, AVRO_RECORD);
     }
 
     @Test
     void sendEvent_createsProducerRecordWithCorrectTopic() {
         producer.sendEvent(createTestEvent(), mockCallback);
 
-        ArgumentCaptor<ProducerRecord<String, String>> captor = ArgumentCaptor.forClass(ProducerRecord.class);
+        ArgumentCaptor<ProducerRecord<String, SpecificRecord>> captor = ArgumentCaptor.forClass(ProducerRecord.class);
         verify(mockProducer).send(captor.capture(), any(Callback.class));
 
-        ProducerRecord<String, String> record = captor.getValue();
+        ProducerRecord<String, SpecificRecord> record = captor.getValue();
         assertEquals(TOPIC, record.topic());
     }
 
@@ -60,10 +67,10 @@ class RaceEventProducerTest {
     void sendEvent_createsProducerRecordWithCorrectTimestamp() {
         producer.sendEvent(createTestEvent(), mockCallback);
 
-        ArgumentCaptor<ProducerRecord<String, String>> captor = ArgumentCaptor.forClass(ProducerRecord.class);
+        ArgumentCaptor<ProducerRecord<String, SpecificRecord>> captor = ArgumentCaptor.forClass(ProducerRecord.class);
         verify(mockProducer).send(captor.capture(), any(Callback.class));
 
-        ProducerRecord<String, String> record = captor.getValue();
+        ProducerRecord<String, SpecificRecord> record = captor.getValue();
         assertEquals(TIMESTAMP, record.timestamp());
     }
 
@@ -71,21 +78,21 @@ class RaceEventProducerTest {
     void sendEvent_createsProducerRecordWithCorrectValue() {
         producer.sendEvent(createTestEvent(), mockCallback);
 
-        ArgumentCaptor<ProducerRecord<String, String>> captor = ArgumentCaptor.forClass(ProducerRecord.class);
+        ArgumentCaptor<ProducerRecord<String, SpecificRecord>> captor = ArgumentCaptor.forClass(ProducerRecord.class);
         verify(mockProducer).send(captor.capture(), any(Callback.class));
 
-        ProducerRecord<String, String> record = captor.getValue();
-        assertEquals(JSON_STRING, record.value());
+        ProducerRecord<String, SpecificRecord> record = captor.getValue();
+        assertEquals(AVRO_RECORD, record.value());
     }
 
     @Test
     void sendEvent_createsProducerRecordWithNullKey() {
         producer.sendEvent(createTestEvent(), mockCallback);
 
-        ArgumentCaptor<ProducerRecord<String, String>> captor = ArgumentCaptor.forClass(ProducerRecord.class);
+        ArgumentCaptor<ProducerRecord<String, SpecificRecord>> captor = ArgumentCaptor.forClass(ProducerRecord.class);
         verify(mockProducer).send(captor.capture(), any(Callback.class));
 
-        ProducerRecord<String, String> record = captor.getValue();
+        ProducerRecord<String, SpecificRecord> record = captor.getValue();
         assertNull(record.key());
     }
 

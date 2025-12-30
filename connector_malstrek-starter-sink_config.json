@@ -1,11 +1,12 @@
 {
   "name": "malstrek-starter-sink",
   "config": {
+    "value.converter.schema.registry.url": "http://schema-registry:8081",
     "name": "malstrek-starter-sink",
     "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
     "tasks.max": "1",
     "key.converter": "org.apache.kafka.connect.storage.StringConverter",
-    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
     "errors.tolerance": "all",
     "topics": "start-line",
     "errors.deadletterqueue.topic.name": "start-line-dlq",
@@ -19,7 +20,6 @@
     "table.name.format": "starters",
     "pk.mode": "none",
     "pk.fields": "",
-    "auto.create": "true",
-    "value.converter.schemas.enable": "true"
+    "auto.create": "true"
   }
 }

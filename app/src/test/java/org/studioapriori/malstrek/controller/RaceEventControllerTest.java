@@ -10,7 +10,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
+import org.studioapriori.malstrek.avro.Finisher;
+import org.studioapriori.malstrek.avro.Starter;
 import org.studioapriori.malstrek.model.RaceEvent;
 import org.studioapriori.malstrek.services.EventAssemblyService;
 import org.studioapriori.malstrek.services.EventCallback;
@@ -49,12 +50,33 @@ class RaceEventControllerTest {
     }
 
     private RaceEvent createStarterEvent() {
-        return new RaceEvent(STARTER_TOPIC, STARTER_TIMESTAMP, RACE_NUMBER, "{\"type\":\"starter\"}");
+        return new RaceEvent(
+            STARTER_TOPIC, 
+            STARTER_TIMESTAMP, 
+            RACE_NUMBER, 
+            "{\"type\":\"starter\"}", 
+            Starter.newBuilder()
+                .setDeleted(false)
+                .setRaceNumber(RACE_NUMBER)
+                .setTimestamp(STARTER_TIMESTAMP)
+                .build()
+        );
     }
 
     private RaceEvent createFinisherEvent(Integer bibNumber) {
         String json = bibNumber != null ? "{\"bib\":" + bibNumber + "}" : "{\"bib\":null}";
-        return new RaceEvent(FINISHER_TOPIC, FINISHER_TIMESTAMP, RACE_NUMBER, json);
+        return new RaceEvent(
+            FINISHER_TOPIC, 
+            FINISHER_TIMESTAMP, 
+            RACE_NUMBER, 
+            json, 
+            Finisher.newBuilder()
+                .setDeleted(false)
+                .setRaceNumber(RACE_NUMBER)
+                .setBibNumber(bibNumber)
+                .setTimestamp(FINISHER_TIMESTAMP)
+                .build()
+        );
     }
 
     @Test
