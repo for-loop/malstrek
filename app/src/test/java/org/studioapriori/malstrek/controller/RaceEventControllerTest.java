@@ -128,8 +128,6 @@ class RaceEventControllerTest {
 
         verify(mockUI).displayEvent(
             starterEvent.topic(),
-            starterEvent.raceNumber(),
-            starterEvent.timestamp(),
             starterEvent.avroRecord().toString()
         );
     }

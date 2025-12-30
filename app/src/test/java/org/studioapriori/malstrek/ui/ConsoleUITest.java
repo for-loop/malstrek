@@ -23,7 +23,6 @@ class ConsoleUITest {
     private static final String ARBITRARY_INPUT = "some input";
     private static final String ERROR_MESSAGE = "Something went wrong";
     private static final String RACE_TOPIC = "race.starters";
-    private static final int RACE_NUMBER = 2028;
     private static final long TIMESTAMP = 1762883020000L;
     private static final String JSON_DATA = "{\"type\":\"starter\"}";
 
@@ -202,12 +201,11 @@ class ConsoleUITest {
     @Test
     void displayEvent_formatsAndPrintsEventData() {
         initUI();
-        ui.displayEvent(RACE_TOPIC, RACE_NUMBER, TIMESTAMP, JSON_DATA);
+        ui.displayEvent(RACE_TOPIC, JSON_DATA);
 
         String output = getSystemOut();
         assertTrue(output.contains("Produced event to topic"));
         assertTrue(output.contains(RACE_TOPIC));
-        assertTrue(output.contains(String.valueOf(RACE_NUMBER)));
         assertTrue(output.contains(JSON_DATA));
     }
 
@@ -216,7 +214,7 @@ class ConsoleUITest {
         initUI();
         String complexJson = "{\"field\":\"value\\nwith\\nnewlines\"}";
 
-        ui.displayEvent("topic", 123, 456L, complexJson);
+        ui.displayEvent("topic", complexJson);
 
         assertTrue(getSystemOut().contains(complexJson));
     }
