@@ -45,8 +45,8 @@ public class ConsoleUI {
         System.out.println(message);
     }
 
-    public void displayEvent(String topic, int raceNumber, long timestamp, String jsonString) {
-        System.out.printf("Produced event to topic %s: %s %d %s%n", topic, raceNumber, timestamp, jsonString);
+    public void displayEvent(String topic, String jsonString) {
+        System.out.printf("Produced event to topic %s: %s%n", topic, jsonString);
     }
 
     public void displayError(String message) {
