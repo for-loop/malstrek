@@ -5,6 +5,7 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
+import org.studioapriori.malstrek.config.AppConfig;
 import org.studioapriori.malstrek.model.RaceEvent;
 import static org.apache.kafka.clients.producer.ProducerConfig.*;
 import org.apache.avro.specific.SpecificRecord;
@@ -33,17 +34,17 @@ public class RaceEventProducer {
      * Factory method to create a RaceEventProducer with default configuration.
      * Used in production code.
      *
-     * @param bootstrapServers the Kafka bootstrap servers address
+     * @param config the application configuration
      * @return a new RaceEventProducer instance
      */
-    public static RaceEventProducer create(String bootstrapServers) {
-        final Properties props = new Properties() {
+    public static RaceEventProducer create(AppConfig config) {
+         final Properties props = new Properties() {
             {
-                put(BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+                put(BOOTSTRAP_SERVERS_CONFIG, config.getKafkaBootstrapServers());
                 put(KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getCanonicalName());
                 put(VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getCanonicalName());
                 put(ACKS_CONFIG, "all");
-                put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, System.getenv("KAFKA_SCHEMA_REGISTRY_URL") != null ? System.getenv("KAFKA_SCHEMA_REGISTRY_URL") : "http://localhost:8081");
+                put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, config.getSchemaRegistryUrl());
             }
         };
         return new RaceEventProducer(new KafkaProducer<>(props));
