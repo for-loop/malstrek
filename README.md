@@ -31,6 +31,7 @@ Add the following to the `.zshrc` or `.bashrc` (if running the non-containerized
 
 ```bash
 export KAFKA_BOOTSTRAP_SERVERS=<KAFKA_BOOTSTRAP_SERVER>:9092
+export KAFKA_SCHEMA_REGISTRY_URL=http://localhost:8081
 ```
 
 > For local development, set it to `0.0.0.0:9092`

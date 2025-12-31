@@ -11,6 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.studioapriori.malstrek.avro.Starter;
+import org.studioapriori.malstrek.config.AppConfig;
 import org.studioapriori.malstrek.model.RaceEvent;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,6 +36,9 @@ class RaceEventProducerTest {
 
     @Mock
     private EventCallback mockCallback;
+
+    @Mock
+    private AppConfig mockConfig;
 
     private RaceEventProducer producer;
 
@@ -140,7 +144,10 @@ class RaceEventProducerTest {
 
     @Test
     void create_returnsValidProducerInstance() {
-        RaceEventProducer createdProducer = RaceEventProducer.create("localhost:9092");
+        when(mockConfig.getKafkaBootstrapServers()).thenReturn("localhost:9092");
+        when(mockConfig.getSchemaRegistryUrl()).thenReturn("http://localhost:8081");
+        
+        RaceEventProducer createdProducer = RaceEventProducer.create(mockConfig);
 
         assertNotNull(createdProducer);
         

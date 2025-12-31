@@ -1,5 +1,6 @@
 package org.studioapriori.malstrek;
 
+import org.studioapriori.malstrek.config.AppConfig;
 import org.studioapriori.malstrek.controller.RaceEventController;
 import org.studioapriori.malstrek.services.EventAssemblyService;
 import org.studioapriori.malstrek.services.RaceEventProducer;
@@ -11,17 +12,12 @@ import org.studioapriori.malstrek.ui.ConsoleUI;
  */
 public class App {
     public static void main(String[] args) {
-        String kafkaBootstrapServers = System.getenv("KAFKA_BOOTSTRAP_SERVERS");
-        if (kafkaBootstrapServers == null || kafkaBootstrapServers.isBlank()) {
-            throw new IllegalStateException(
-                "KAFKA_BOOTSTRAP_SERVERS environment variable is not set. " +
-                "Please set it to your Kafka broker address (e.g., localhost:9092 or broker.example.com:9092)"
-            );
-        }
+        AppConfig config = new AppConfig();
+        
         ConsoleUI ui = new ConsoleUI();
         ui.displayGreeting("Hello World!");
 
-        RaceEventProducer producer = RaceEventProducer.create(kafkaBootstrapServers);
+        RaceEventProducer producer = RaceEventProducer.create(config);
         EventAssemblyService assemblyService = new EventAssemblyService();
         RaceEventController controller = new RaceEventController(ui, producer, assemblyService);
 
