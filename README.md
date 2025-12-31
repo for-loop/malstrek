@@ -51,6 +51,18 @@ curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" \
 
 ## Kafka Connect Config
 
+### Add connector
+
+Required: Manually edit `connection.user` and `connection.password` fields
+
+```bash
+curl -X POST -H "Content-Type: application/json" --data @connector_malstrek-starter-sink_config.json http://localhost:8083/connectors
+```
+
+```bash
+curl -X POST -H "Content-Type: application/json" --data @connector_malstrek-finisher-sink_config.json http://localhost:8083/connectors
+```
+
 See Configuration Reference for [JDBC Sink Connector](https://docs.confluent.io/kafka-connectors/jdbc/current/sink-connector/sink_config_options.html)
 
 ---
