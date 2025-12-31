@@ -35,6 +35,24 @@ export KAFKA_BOOTSTRAP_SERVERS=<KAFKA_BOOTSTRAP_SERVER>:9092
 
 > For local development, set it to `0.0.0.0:9092`
 
+### List topics
+
+> This will wait until broker is reachable
+
+```bash
+docker exec -it broker kafka-topics --bootstrap-server broker:29092 --list
+```
+
+### Create topics
+
+```bash
+docker exec -it broker kafka-topics --create --topic start-line --bootstrap-server broker:29092 --partitions 1 --replication-factor 1
+```
+
+```bash
+docker exec -it broker kafka-topics --create --topic finish-line --bootstrap-server broker:29092 --partitions 1 --replication-factor 1
+```
+
 ### Register schema
 
 ```bash
