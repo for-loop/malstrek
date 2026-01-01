@@ -15,7 +15,7 @@ public class App {
         AppConfig config = new AppConfig();
         
         ConsoleUI ui = new ConsoleUI();
-        ui.displayGreeting("Hello World!");
+        ui.displayGreeting("Hello, I'm Malstrek!");
 
         RaceEventProducer producer = RaceEventProducer.create(config);
         EventAssemblyService assemblyService = new EventAssemblyService();
