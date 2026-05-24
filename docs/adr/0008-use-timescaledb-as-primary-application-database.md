@@ -128,9 +128,8 @@ Event volume thresholds inform *infrastructure separation*, not database adoptio
 - **Stack Simplification**: One database engine (PostgreSQL) instead of MariaDB + PostgreSQL
 
 ### Implementation & Schema Design
-For detailed schema design, indexing strategy, and optimization opportunities for PostgreSQL, see [Schema Design Guide](../schema-design.md).
 - **Migration files**: Straightforward translation from MySQL → PostgreSQL SQL dialect
-- **Application code**: Only JDBC connection URL needs updating
+- **Application code**: Update JDBC connection URL and other config
 - **Fresh deployment**: System is not yet in production; start with clean PostgreSQL schema (no data migration from MariaDB)
 
 ## Consequences
@@ -343,7 +342,7 @@ WHERE f.deleted <> 1
 
 Detailed deployment, migration, and operational procedures are documented separately:
 - **Deployment checklist & setup**: See deployment runbook (step-by-step setup, validation, monitoring)
-- **Schema DDL & indexes**: See [Schema Design Guide](../schema-design.md) and migration files in repository
+- **Schema DDL & indexes**: Translation of the migration files in repository; other refinements to follow
 - **JDBC Sink Connector configuration**: See Kafka/connector ops guide (PostgreSQL dialect configuration, type mapping)
 - **Monitoring & runbooks**: PostgreSQL tuning, compression monitoring, operational metrics
 - **Backup strategy**: Including compression metadata handling
