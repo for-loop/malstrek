@@ -1,7 +1,7 @@
 # ADR 0008: Use PostgreSQL as Primary Application Database
 
-**Date:** 2026-05-13  
-**Status:** Proposed  
+**Date:** 2026-05-24  
+**Status:** Approved  
 **Deciders:** studio a priori
 
 ## Context
