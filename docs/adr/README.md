@@ -27,6 +27,7 @@ Malstrek is an event-driven race timing application that captures runner start/f
 | ID | Title | Status | Summary |
 |---|---|---|---|
 | [0003](0003-use-jdbc-sink-connector-for-event-persistence.md) | Use JDBC Sink Connector for Event Persistence | Accepted | Kafka JDBC Sink Connector automatically writes events to database with zero custom code. |
+| [0008](0008-use-timescaledb-as-primary-application-database.md) | Use TimescaleDB as Primary Application Database | Proposed | TimescaleDB supports mutable operations (manual corrections) within 72 hour SLA. |
 
 ### Technology Stack
 
@@ -46,9 +47,9 @@ Kafka Topics (start-line, finish-line)
     ↓
 JDBC Sink Connector
     ↓
-MariaDB Database
+TimescaleDB Database (malstrek-db)
     ↓
-Metabase Analytics Dashboard
+Metabase Analytics Dashboard ← PostgreSQL (metabase-db)
 ```
 
 ### Technology Stack
@@ -59,7 +60,7 @@ Metabase Analytics Dashboard
 - **Event Serialization**: Apache Avro 1.11.3
 - **Schema Registry**: Confluent Schema Registry 7.9.0
 - **Event Persistence**: Kafka JDBC Sink Connector
-- **Database**: MariaDB 11.7.2
+- **Database**: PostgreSQL (separate instances for app and analytics)
 - **Schema Migration**: golang-migrate 4.18.3
 - **Containerization**: Docker with multi-stage builds
 - **Analytics**: Metabase 0.56.8
