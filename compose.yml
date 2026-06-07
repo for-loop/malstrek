@@ -51,7 +51,8 @@ services:
         - malstrek-db
       volumes:
         - ./migrations/postgres:/migrations-postgres
-      command: ["migrate", "-database", "postgres://${TIMESCALEDB_USER}:${TIMESCALEDB_PASSWORD}@${TIMESCALEDB_HOST}:${TIMESCALEDB_PORT}/${TIMESCALEDB_DB}?sslmode=disable", "-path", "/migrations-postgres", "up"]
+      env_file: ".env"
+      command: ["migrate", "-database", "postgres://$TIMESCALEDB_USER:$TIMESCALEDB_PASSWORD@$TIMESCALEDB_HOST:$TIMESCALEDB_PORT/$TIMESCALEDB_DB?sslmode=disable", "-path", "/migrations-postgres", "up"]
       networks:
         - streamer_default
 
