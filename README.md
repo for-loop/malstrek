@@ -11,6 +11,12 @@ Log time of runners at the finish line of a small race. The name comes from mål
 Create `.env` file at the root directory
 
 ```bash
+TIMESCALEDB_HOST=malstrek-db
+TIMESCALEDB_DB=<DATABASE_NAME>
+TIMESCALEDB_USER=<USER_NAME>
+TIMESCALEDB_PASSWORD=<PASSWORD>
+TIMESCALEDB_PORT=5432
+TIMESCALEDB_LOCAL_PORT=<LOCAL_PORT>
 MARIADB_ROOT_PASSWORD=<YOUR_ROOT_USER_PASSWORD>
 MYSQL_DATABASE=<DATABASE_NAME>
 MYSQL_USER=<YOUR_USER_NAME>
@@ -86,6 +92,14 @@ See Configuration Reference for [JDBC Sink Connector](https://docs.confluent.io/
 
 ---
 
+Open Docker Desktop
+
+## First time
+
+```bash
+docker compose up -d
+```
+
 ## Build
 
 Build images (Internet connection required)
@@ -99,7 +113,7 @@ docker compose build
 Run background containers (offline OK)
 
 ```bash
-docker compose up db migrate metabase metabase-db --no-build --pull=never -d
+docker compose up db migrate metabase metabase-db malstrek-db migrate-pg --no-build --pull=never -d
 ```
 
 Run the app

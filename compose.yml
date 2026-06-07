@@ -25,6 +25,36 @@ services:
       networks:
         - streamer_default
     
+    malstrek-db:
+      image: timescale/timescaledb:2.18.0-pg17
+      container_name: malstrek-db
+      hostname: malstrek-db
+      ports:
+        - "${TIMESCALEDB_LOCAL_PORT}:${TIMESCALEDB_PORT}"
+      environment:
+        POSTGRES_DB: ${TIMESCALEDB_DB}
+        POSTGRES_USER: ${TIMESCALEDB_USER}
+        POSTGRES_PASSWORD: ${TIMESCALEDB_PASSWORD}
+      volumes:
+        - malstrek_db_data:/var/lib/postgresql/data
+      networks:
+        - streamer_default
+      restart: always
+
+    migrate-pg:
+      build: 
+        context: .
+        dockerfile: Dockerfile
+        target: migrate_tool_postgres
+      container_name: migrate-pg
+      depends_on:
+        - malstrek-db
+      volumes:
+        - ./migrations/postgres:/migrations-postgres
+      command: ["migrate", "-database", "postgres://${TIMESCALEDB_USER}:${TIMESCALEDB_PASSWORD}@${TIMESCALEDB_HOST}:${TIMESCALEDB_PORT}/${TIMESCALEDB_DB}?sslmode=disable", "-path", "/migrations-postgres", "up"]
+      networks:
+        - streamer_default
+
     malstrek-app:
       build: 
         context: .
@@ -71,6 +101,7 @@ services:
 volumes:
   mariadb_data:
   metabase_db_data:
+  malstrek_db_data:
 
 networks:
   streamer_default:
