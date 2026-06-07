@@ -17,6 +17,25 @@ ENTRYPOINT ["sh", "/usr/local/bin/wait-for-mariadb", "db", "3306"]
 CMD ["sh"]
 
 
+# Migration tool for PostgreSQL using golang-migrate
+FROM alpine:3.22.2 AS migrate_tool_postgres
+
+RUN apk update && apk --no-cache add curl unzip
+
+ARG MIGRATE_VERSION=4.18.3
+RUN curl -L "https://github.com/golang-migrate/migrate/releases/download/v${MIGRATE_VERSION}/migrate.linux-arm64.tar.gz" | tar xvz
+
+RUN mv /migrate /usr/local/bin/migrate
+
+COPY ./migrations/postgres /migrations-postgres
+
+COPY ./migrate/wait-for-postgres.sh /usr/local/bin/wait-for-postgres
+RUN chmod +x /usr/local/bin/wait-for-postgres
+
+ENTRYPOINT ["sh", "/usr/local/bin/wait-for-postgres", "malstrek-db", "5432"]
+CMD ["sh"]
+
+
 # Malstrek app
 FROM gradle:8.14.2-jdk17 AS java_build
 WORKDIR /app
