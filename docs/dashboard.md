@@ -19,17 +19,26 @@ Create a question named "All Finishers"
 2. Paste this query
     ```sql
     SELECT
-        DENSE_RANK() OVER (PARTITION BY race_number ORDER BY duration ASC) AS finishers,
+        DENSE_RANK() OVER (PARTITION BY race_number ORDER BY d.duration ASC) AS finishers,
         finisher_id,
         race_number,
         bib_number,
-        SEC_TO_TIME(ROUND((f.timestamp - s.timestamp) / 1000)) AS duration
-    FROM
-        finishers AS f
-    INNER JOIN starters AS s USING (race_number)
-    WHERE
-        f.deleted <> 1;
-
+        TO_CHAR(d.duration, 'HH24:MI:SS') AS duration,
+        CAST(EXTRACT(EPOCH FROM d.duration) / 60.0 AS NUMERIC) AS minutes -- Explicitly cast to numeric so Metabase can finger-print it
+    FROM finishers AS f
+    INNER JOIN (
+        -- Isolates exactly one row per race_number using the earliest timestamp
+        SELECT DISTINCT ON (race_number) 
+            race_number, 
+            timestamp
+        FROM starters
+        WHERE NOT deleted
+        ORDER BY race_number, timestamp ASC
+    ) AS s USING (race_number)
+    CROSS JOIN LATERAL (
+        SELECT f.timestamp - s.timestamp AS duration
+    ) AS d
+    WHERE NOT f.deleted;
     ```
 3. Click on Gear icon next to Visualization button
 4. Next to `duration`, click `...`  
