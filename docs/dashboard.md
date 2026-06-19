@@ -30,7 +30,7 @@ Create a question named "All Finishers"
     CROSS JOIN LATERAL (
         SELECT f.timestamp - s.timestamp AS duration
     ) AS d
-    WHERE NOT f.deleted;
+    WHERE NOT s.deleted AND NOT f.deleted;
     ```
 3. Click on Gear icon next to Visualization button
 4. Next to `duration`, click `...`  
