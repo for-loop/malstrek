@@ -26,11 +26,19 @@ Create a question named "All Finishers"
         TO_CHAR(d.duration, 'HH24:MI:SS') AS duration,
         CAST(EXTRACT(EPOCH FROM d.duration) / 60.0 AS NUMERIC) AS minutes -- Explicitly cast to numeric so Metabase can finger-print it
     FROM finishers AS f
-    INNER JOIN starters AS s USING (race_number)
+    INNER JOIN (
+        -- Isolates exactly one row per race_number using the earliest timestamp
+        SELECT DISTINCT ON (race_number) 
+            race_number, 
+            timestamp
+        FROM starters
+        WHERE NOT deleted
+        ORDER BY race_number, timestamp ASC
+    ) AS s USING (race_number)
     CROSS JOIN LATERAL (
         SELECT f.timestamp - s.timestamp AS duration
     ) AS d
-    WHERE NOT s.deleted AND NOT f.deleted;
+    WHERE NOT f.deleted;
     ```
 3. Click on Gear icon next to Visualization button
 4. Next to `duration`, click `...`  
