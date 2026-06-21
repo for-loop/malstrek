@@ -4,70 +4,81 @@
 
 Follow instructions to start Metabase
 
+http://localhost:3000
+
 ## Minimal set up
 
-Create a question named "Race Numbers"—this will be used as a dropdown filter on the dashboard
+### Race Numbers
+
+This will be used as a dropdown filter on the dashboard
 
 1. Click New button and select "Question"
-2. Select `starters` as Data
-2. Group by `race_number`
-3. Save as "Race Numbers"
+1. Select "Races" as Data
+1. Group by "Race Number"
+1. Save as "Race Numbers"
 
-Create a question named "All Finishers"
+### Race Finishers View
 
-1. Click New button and select "SQL query"
-2. Paste this query
-    ```sql
-    SELECT
-        DENSE_RANK() OVER (PARTITION BY race_number ORDER BY d.duration ASC) AS finishers,
-        finisher_id,
-        race_number,
-        bib_number,
-        TO_CHAR(d.duration, 'HH24:MI:SS') AS duration,
-        CAST(EXTRACT(EPOCH FROM d.duration) / 60.0 AS NUMERIC) AS minutes -- Explicitly cast to numeric so Metabase can finger-print it
-    FROM finishers AS f
-    INNER JOIN (
-        -- Isolates exactly one row per race_number using the earliest timestamp
-        SELECT DISTINCT ON (race_number) 
-            race_number, 
-            timestamp
-        FROM starters
-        WHERE NOT deleted
-        ORDER BY race_number, timestamp ASC
-    ) AS s USING (race_number)
-    CROSS JOIN LATERAL (
-        SELECT f.timestamp - s.timestamp AS duration
-    ) AS d
-    WHERE NOT f.deleted;
-    ```
-3. Click on Gear icon next to Visualization button
-4. Next to `duration`, click `...`  
-    a. Under "Show the time", click on `HH:MM:SS`  
-    b. Under "Time style", choose "24-hour clock"  
-5. Next to `race_number`, click `...`  
-    a. Under Separator style, choose "100000.00"  
-    b. repeat for `finisher_id` and `bib_number`  
-6. Save as "All Finishers"
+1. Click New button and select "Question"
+1. Select "V Race Finishers"
+1. Click on Gear icon next to Visualization button
+1. (optional) Next to "Finisher Time", click `...`  
+    * Under "Show the time", click on `HH:MM:SS`  
+    * Under "Time style", choose "24-hour clock"  
+1. Next to "Race Number", click `...`  
+    * Under Separator style, choose "100000.00"  
+    * repeat for "Finisher ID" and "Bib Number"
+1. Save as "Race Finishers View"
 
-Create a question named "All Finishers Descending"
+### All Finishers Descending
 
 1. Click on New button and select "Question"
-2. Select "All Finishers" as Data
-3. Sort descending on `finishers`
-4. Save as "All Finishers Descending"
+1. Select "Race Finishers View" as Data
+1. Sort descending on "Finishers"
+1. Save as "All Finishers Descending"
 
-Create a dashboard named "Malstrek Dashboard"
+### Histogram
+
+1. Click on New button and select "Question"
+1. Select "Race Finishers View" as Data
+1. Summarize "Count" by "Finisher Time:Minute"
+1. Save as "Histogram"
+
+### Duplicated bib numbers
+
+1. Click on New button and select "Question"
+1. Select "Race Finishers View" as Data
+1. Summarize "Count" by "Bib Number"
+1. Click on the Filter below it and select "Count is greater than 1"
+1. Save as "Duplicated bib numbers"
+
+### Malstrek Dashboard
 
 1. Click on New button and select Dashboard
-2. Add "All Finishers Descending"
-3. Click on Filter icon and create a race number filter
-    a. Label: "Race Number"  
-    b. Filter or parameter type: "Number"  
-    c. Dropdown list  
-        i. From another model or question  
-        ii. Model or question to supply the values: "Race Numbers"  
-        iii. Column to supply the values: "Race Number"  
-    d. Set a Default value  
-    e. Enable "Always require a value"  
-4. Click Done button
-5. Save as "Malstrek Dashboard"
+1. Add "All Finishers Descending"
+1. Click on Filter icon and create a race number filter
+    * Label: "Race Number"  
+    * Filter or parameter type: "Number"  
+    * Dropdown list  
+        * From another model or question  
+        * Model or question to supply the values: "Race Numbers"  
+        * Column to supply the values: "Race Number"  
+    * Set a Default value  
+    * Enable "Always require a value"  
+1. Click Done button
+1. Add "Histogram" and "Duplicated bib numbers"
+  * Click on "Edit visualization" icon on the chart
+  * Click Settings
+  * Flip "Hide this card if there are no results"
+  * Click Save button
+  * Set the Field Filter by "Race Number"
+1. Save as "Malstrek Dashboard"
+
+### Refresh 10 s
+
+Append `#refresh=10` to the browser URL
+
+### Full screen
+
+1. Click `...` below the New button on the dashboard
+1. Select "Enter full screen"
