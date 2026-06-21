@@ -174,13 +174,11 @@ In the Terminal,
 
 Access the dashboard
 
-```
 http://localhost:3000
-```
 
 ### First time
 
-Follow the [instructions](https://www.metabase.com/docs/latest/configuring-metabase/setting-up-metabase) to set it up
+Follow the [official instructions](https://www.metabase.com/docs/latest/configuring-metabase/setting-up-metabase) and [malstrek dashboard instructions](docs/dashboard.md)
 
 ### Postgres (backend for Metabase)
 
