@@ -17,10 +17,6 @@ TIMESCALEDB_USER=<USER_NAME>
 TIMESCALEDB_PASSWORD=<PASSWORD>
 TIMESCALEDB_PORT=5432
 TIMESCALEDB_LOCAL_PORT=<LOCAL_PORT>
-MARIADB_ROOT_PASSWORD=<YOUR_ROOT_USER_PASSWORD>
-MYSQL_DATABASE=<DATABASE_NAME>
-MYSQL_USER=<YOUR_USER_NAME>
-MYSQL_PASSWORD=<YOUR_USER_PASSWORD>
 MB_DB_TYPE=postgres
 MB_DB_DBNAME=<METABASE_DATABASE_NAME>
 MB_DB_PORT=5432
@@ -113,7 +109,7 @@ docker compose build
 Run background containers (offline OK)
 
 ```bash
-docker compose up db migrate metabase metabase-db malstrek-db migrate-pg --no-build --pull=never -d
+docker compose up metabase metabase-db malstrek-db migrate-pg --no-build --pull=never -d
 ```
 
 Run the app
@@ -125,31 +121,13 @@ docker compose run --rm malstrek-app
 Start bash prompt inside the container
 
 ```bash
-docker exec -it db bash
+docker exec -it malstrek-db bash
 ```
 
 Log onto the database
 
 ```bash
-mariadb -u <YOUR_USER_NAME> -p
-```
-
-Switch database
-
-```sql
-USE <DATABASE_NAME>;
-```
-
-Exit the database
-
-```sql
-exit
-```
-
-Exit the bash prompt
-
-```bash
-exit
+psql -h <TIMESCALEDB_HOST> -p <TIMESCALEDB_PORT> -U <TIMESCALEDB_USER> -d <TIMESCALEDB_DB>
 ```
 
 ## Stop
