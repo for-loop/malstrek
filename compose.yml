@@ -30,6 +30,29 @@ services:
       networks:
         - streamer_default
 
+    init-kafka:
+      image: confluentinc/cp-server:8.1.1
+      container_name: init-kafka
+      depends_on:
+        - malstrek-db
+      volumes:
+        - ./scripts:/scripts
+        - ./connector_configs:/connector_configs
+        - ./app/src/main/avro:/avro
+      env_file: ".env"
+      environment:
+        KAFKA_BOOTSTRAP_SERVERS: broker:29092
+        KAFKA_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+        KAFKA_CONNECT_URL: http://connect:8083
+      networks:
+        - streamer_default
+      command: >
+        /bin/bash -lc '
+          chmod +x /scripts/*.sh &&
+          /scripts/init-kafka.sh
+        '
+      restart: "on-failure:3"
+
     malstrek-app:
       build: 
         context: .
@@ -38,6 +61,7 @@ services:
       depends_on:
         - malstrek-db
         - migrate-pg
+        - init-kafka
       ports:
         - "8080:8080"
       env_file: ".env"
