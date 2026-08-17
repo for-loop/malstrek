@@ -82,7 +82,7 @@ class ServiceMonitor:
             try:
                 with socket.create_connection((host, port), timeout=2) as socket_connection:
                     return True
-            except socket.timeout, ConnectionRefusedError:
+            except (socket.timeout, ConnectionRefusedError):
                 return False
 
         return self.wait_for_service("Kafka Broker", check_broker)
