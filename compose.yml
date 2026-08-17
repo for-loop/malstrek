@@ -30,6 +30,26 @@ services:
       networks:
         - streamer_default
 
+    init-kafka:
+      build:
+        context: .
+        dockerfile: Dockerfile.init-kafka
+      container_name: init-kafka
+      depends_on:
+        - malstrek-db
+      volumes:
+        - ./app/src/main/avro:/app/avro
+        - ./connector_configs:/app/connector_configs
+      env_file: ".env"
+      environment:
+        KAFKA_BOOTSTRAP_SERVERS: broker:29092
+        KAFKA_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+        KAFKA_CONNECT_URL: http://connect:8083
+        PYTHONPATH: /app
+      networks:
+        - streamer_default
+      restart: "on-failure:3"
+
     malstrek-app:
       build: 
         context: .
@@ -38,6 +58,7 @@ services:
       depends_on:
         - malstrek-db
         - migrate-pg
+        - init-kafka
       ports:
         - "8080:8080"
       env_file: ".env"

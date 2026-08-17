@@ -4,43 +4,200 @@ Log time of runners at the finish line of a small race. The name comes from mål
 
 ## Prerequisites
 
-* Kafka https://github.com/for-loop/streamer
+### Python Environment Setup
 
-## First time
-
-Create `.env` file at the root directory
+Install the modern environment manager:
 
 ```bash
-TIMESCALEDB_HOST=malstrek-db
-TIMESCALEDB_DB=<DATABASE_NAME>
-TIMESCALEDB_USER=<USER_NAME>
-TIMESCALEDB_PASSWORD=<PASSWORD>
-TIMESCALEDB_PORT=5432
-TIMESCALEDB_LOCAL_PORT=<LOCAL_PORT>
-MB_DB_TYPE=postgres
-MB_DB_DBNAME=<METABASE_DATABASE_NAME>
-MB_DB_PORT=5432
-MB_DB_USER=<METABASE_DATABASE_USER>
-MB_DB_PASS=<METABASE_DATABASE_PASSWORD>
-MB_DB_HOST=metabase-db
-POSTGRES_USER=<METABASE_DATABASE_USER>
-POSTGRES_DB=<METABASE_DATABASE_NAME>
-POSTGRES_PASSWORD=<METABASE_DATABASE_PASSWORD>
-KAFKA_SCHEMA_REGISTRY_URL=http://schema-registry:8081
+brew install uv
 ```
 
-Add the following to the `.zshrc` or `.bashrc` (if running the non-containerized app)
+Create a virtual environment and automatically install all code dependencies + dev tools:
 
 ```bash
-export KAFKA_BOOTSTRAP_SERVERS=<KAFKA_BOOTSTRAP_SERVER>:9092
+uv venv --python 3.14
+source .venv/bin/activate  # macOS/Linux
+# or
+.venv\Scripts\activate  # Windows
+
+# Fast sync and editable install via uv instead of pip
+uv pip install -e ".[dev]"
+```
+
+Run tests with coverage:
+
+```bash
+pytest
+```
+
+Format code:
+
+```bash
+black scripts/
+```
+
+Lint code:
+
+```bash
+pylint scripts/
+mypy scripts/
+```
+
+* **Streamer Infrastructure**: https://github.com/for-loop/streamer
+  - Must be running before starting malstrek
+  - Provides Kafka broker, Schema Registry, and Kafka Connect
+
+## First-time setup
+
+### 1. Start the Kafka infrastructure (streamer)
+
+From the streamer repo:
+
+```bash
+cd ../streamer
+docker compose up -d
+```
+
+This starts the broker, Schema Registry, Kafka Connect, and supporting services.
+
+### 2. Create and fill in the malstrek environment file
+
+From the malstrek repo:
+
+```bash
+cp .env.example .env
+```
+
+Then edit `.env` and replace the placeholder values with your real settings, especially:
+- `TIMESCALEDB_PASSWORD`
+- `MB_DB_PASS`
+- `POSTGRES_PASSWORD`
+- any database credentials required by your local environment
+
+### 3. Build images when Internet access is available
+
+```bash
+docker compose build
+```
+
+This matters for a race environment where you may later need to run without Internet access.
+
+### 4. Start the non-interactive infrastructure services
+
+```bash
+docker compose up metabase metabase-db malstrek-db migrate-pg init-kafka --no-build --pull=never -d
+```
+
+This starts the database, migrations, Metabase, and the Kafka bootstrap job without starting the interactive console app.
+
+The `init-kafka` service automatically does the following:
+- ✅ Creates Kafka topics (`start-line`, `finish-line`)
+- ✅ Registers Avro schemas with Schema Registry
+- ✅ Creates JDBC Sink connectors
+
+> `docker compose up -d` is fine for the first-time infrastructure bootstrap, but it is not the correct method for the interactive console app.
+
+### 5. Start the interactive race app
+
+```bash
+docker compose run --rm malstrek-app
+```
+
+This is the correct startup method for the console app because it keeps stdin attached and waits for the user to provide input at the prompt, for example `Enter race number:`.
+
+> Do not run the app with `docker compose up -d` because detached mode does not provide stdin, so the console scanner receives no input and exits with `No line found`.
+
+## Usage
+
+Once the services are running, the system is ready to:
+1. Log race start events via the console UI
+2. Stream runner finish times through Kafka
+3. Persist data to TimescaleDB
+4. View analytics in Metabase (http://localhost:3000)
+
+## Configuration Reference
+
+### Environment Variables
+
+All configuration is managed through the `.env` file. See `.env.example` for all available options:
+
+- **Kafka**: `KAFKA_BOOTSTRAP_SERVERS`, `KAFKA_SCHEMA_REGISTRY_URL`, `KAFKA_CONNECT_URL`
+- **Database**: `TIMESCALEDB_*` (TimescaleDB connection)
+- **Metabase**: `MB_DB_*` (Metabase database configuration)
+- **PostgreSQL**: `POSTGRES_*` (Container defaults)
+
+## Development Commands
+
+### View Service Status
+
+```bash
+docker compose ps
+```
+
+### View Logs
+
+```bash
+# All services
+docker compose logs -f
+
+# Specific service
+docker compose logs -f malstrek-app
+docker compose logs -f init-kafka
+```
+
+### Connect to Database
+
+```bash
+psql -h localhost -p 5432 -U <TIMESCALEDB_USER> -d <TIMESCALEDB_DB>
+```
+
+### List Kafka Topics
+
+```bash
+docker exec broker kafka-topics --bootstrap-server broker:29092 --list
+```
+
+### View Kafka Topic Content
+
+```bash
+docker exec broker kafka-console-consumer \
+  --bootstrap-server broker:29092 \
+  --topic start-line \
+  --from-beginning \
+  --property print.key=true
+```
+
+### Run Console App Locally
+
+Build and run the Java application on your host (requires JDK 17+):
+
+```bash
+./gradlew run
+```
+
+Set these environment variables for local development:
+```bash
+export KAFKA_BOOTSTRAP_SERVERS=localhost:9092
 export KAFKA_SCHEMA_REGISTRY_URL=http://localhost:8081
 ```
 
-> For local development, set it to `0.0.0.0:9092`
+### Execute Commands in Container
+
+```bash
+# Start bash session in app container
+docker exec -it malstrek-app bash
+
+# Start bash session in database container
+docker exec -it malstrek-db bash
+```
+
+## Manual Kafka Setup Reference
+
+These commands are kept as a reference for manual debugging or quick development work when you want to create or inspect Kafka topics, schemas, or connectors without using the automated `init-kafka` bootstrap service.
 
 ### List topics
 
-> This will wait until broker is reachable
+> This will wait until the broker is reachable.
 
 ```bash
 docker exec -it broker kafka-topics --bootstrap-server broker:29092 --list
@@ -74,7 +231,7 @@ curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" \
 
 ### Add connector
 
-Required: Manually edit `connection.user` and `connection.password` fields
+Required: manually edit `connection.user` and `connection.password` fields.
 
 ```bash
 curl -X POST -H "Content-Type: application/json" --data @connector_malstrek-starter-sink_config.json http://localhost:8083/connectors
@@ -84,69 +241,155 @@ curl -X POST -H "Content-Type: application/json" --data @connector_malstrek-star
 curl -X POST -H "Content-Type: application/json" --data @connector_malstrek-finisher-sink_config.json http://localhost:8083/connectors
 ```
 
-See Configuration Reference for [JDBC Sink Connector](https://docs.confluent.io/kafka-connectors/jdbc/current/sink-connector/sink_config_options.html)
+See the Configuration Reference for the [JDBC Sink Connector](https://docs.confluent.io/kafka-connectors/jdbc/current/sink-connector/sink_config_options.html).
 
----
+## Troubleshooting
 
-Open Docker Desktop
+### Re-Initialize Kafka Infrastructure
 
-## First time
+If you need to recreate topics/schemas/connectors:
 
 ```bash
+# Stop everything
+docker compose down
+
+# Start streamer fresh
+cd ../streamer
+docker compose down
 docker compose up -d
+
+# Return and start malstrek
+cd ../malstrek
+docker compose up -d  # Automatic re-initialization
 ```
+
+### View Connector Status
+
+```bash
+curl http://localhost:8083/connectors
+curl http://localhost:8083/connectors/malstrek-starter-sink/status
+curl http://localhost:8083/connectors/malstrek-finisher-sink/status
+```
+
+### Reset Database
+
+To start with a fresh database (deletes all data):
+
+```bash
+docker compose down -v  # Remove volumes
+docker compose up -d    # Recreate with migrations
+```
+
+## Architecture
+
+### Service Topology
+
+```
+streamer (infrastructure)
+    ├── Kafka Broker
+    ├── Schema Registry
+    ├── Kafka Connect
+    └── PostgreSQL
+
+malstrek (application)
+    ├── init-kafka          (automatic setup)
+    ├── malstrek-db         (TimescaleDB)
+    ├── malstrek-app        (race timing app)
+    ├── metabase            (analytics dashboard)
+    └── metabase-db         (Metabase database)
+```
+
+### Data Flow
+
+```
+Console UI → Kafka Topics → JDBC Sink Connector → TimescaleDB → Metabase
+```
+
+**Topics**:
+- `start-line`: Race start events
+- `finish-line`: Runner finish times
+
+**Tables**:
+- `starters`: Start line recordings
+- `finishers`: Finish line recordings
+- Plus supporting tables: races, race_types, race_distances, race_groups, timezones
 
 ## Build
 
-Build images (Internet connection required)
+Build container images (requires Internet connection):
 
 ```bash
 docker compose build
 ```
 
-## Run
-
-Run background containers (offline OK)
-
-```bash
-docker compose up metabase metabase-db malstrek-db migrate-pg --no-build --pull=never -d
-```
-
-Run the app
-
-```bash
-docker compose run --rm malstrek-app
-```
-
-Start bash prompt inside the container
-
-```bash
-docker exec -it malstrek-db bash
-```
-
-Log onto the database
-
-```bash
-psql -h <TIMESCALEDB_HOST> -p <TIMESCALEDB_PORT> -U <TIMESCALEDB_USER> -d <TIMESCALEDB_DB>
-```
-
 ## Stop
+
+Stop all services and remove containers:
 
 ```bash
 docker compose down
 ```
 
+Stop and remove data volumes (warning: deletes all data):
+
+```bash
+docker compose down -v
+```
+
 ---
 
-## Run the console application within VS Code
+## Local Development (VS Code)
 
-In the Terminal,
+### Run on Host Machine
+
+Requires:
+- JDK 17+
+- Gradle (via wrapper)
+- Kafka running in containers
 
 ```bash
 ./gradlew run
 ```
 
+### IDE Setup
+
+The VS Code workspace is pre-configured. Open this folder in VS Code for best experience.
+
 ---
+
+## Kafka Connect Connector Reference
+
+### Automatic Connector Setup
+
+Connectors are created automatically by the `init-kafka` service using templates:
+- `connector_configs/starter-sink.template.json`
+- `connector_configs/finisher-sink.template.json`
+
+Environment variables are automatically substituted during setup.
+
+### Manual Connector Management
+
+For advanced use cases, manually manage connectors via the Kafka Connect REST API:
+
+```bash
+# View all connectors
+curl http://localhost:8083/connectors
+
+# View specific connector status
+curl http://localhost:8083/connectors/malstrek-starter-sink/status
+
+# Delete a connector
+curl -X DELETE http://localhost:8083/connectors/malstrek-starter-sink
+
+# Pause/Resume
+curl -X PUT http://localhost:8083/connectors/malstrek-starter-sink/pause
+curl -X PUT http://localhost:8083/connectors/malstrek-starter-sink/resume
+```
+
+See [JDBC Sink Connector Documentation](https://docs.confluent.io/kafka-connectors/jdbc/current/sink-connector/sink_config_options.html) for configuration options.
+
+---
+
 
 ## Dashboard
 
