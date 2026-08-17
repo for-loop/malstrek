@@ -31,26 +31,23 @@ services:
         - streamer_default
 
     init-kafka:
-      image: confluentinc/cp-server:8.1.1
+      build:
+        context: .
+        dockerfile: Dockerfile.init-kafka
       container_name: init-kafka
       depends_on:
         - malstrek-db
       volumes:
-        - ./scripts:/scripts
-        - ./connector_configs:/connector_configs
-        - ./app/src/main/avro:/avro
+        - ./app/src/main/avro:/app/avro
+        - ./connector_configs:/app/connector_configs
       env_file: ".env"
       environment:
         KAFKA_BOOTSTRAP_SERVERS: broker:29092
         KAFKA_SCHEMA_REGISTRY_URL: http://schema-registry:8081
         KAFKA_CONNECT_URL: http://connect:8083
+        PYTHONPATH: /app
       networks:
         - streamer_default
-      command: >
-        /bin/bash -lc '
-          chmod +x /scripts/*.sh &&
-          /scripts/init-kafka.sh
-        '
       restart: "on-failure:3"
 
     malstrek-app:

@@ -4,6 +4,45 @@ Log time of runners at the finish line of a small race. The name comes from mål
 
 ## Prerequisites
 
+### Python Environment Setup
+
+Install the modern environment manager:
+
+```bash
+brew install uv
+```
+
+Create a virtual environment and automatically install all code dependencies + dev tools:
+
+```bash
+uv venv --python 3.14
+source .venv/bin/activate  # macOS/Linux
+# or
+.venv\Scripts\activate  # Windows
+
+# Fast sync and editable install via uv instead of pip
+uv pip install -e ".[dev]"
+```
+
+Run tests with coverage:
+
+```bash
+pytest
+```
+
+Format code:
+
+```bash
+black scripts/
+```
+
+Lint code:
+
+```bash
+pylint scripts/
+mypy scripts/
+```
+
 * **Streamer Infrastructure**: https://github.com/for-loop/streamer
   - Must be running before starting malstrek
   - Provides Kafka broker, Schema Registry, and Kafka Connect

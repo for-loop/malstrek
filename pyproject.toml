@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "malstrek"
+version = "1.0.0"
+description = "Log time of runners at the finish line of a small race"
+authors = [
+    { name = "studioapriori" }
+]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.14"
+dependencies = [
+    "requests>=2.34.0",
+    "python-dotenv>=1.0.1",
+    "kafka-python>=3.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.1.0",
+    "pytest-cov>=7.1.0",
+    "pytest-mock>=3.14.0",
+    "black>=26.5.0",
+    "pylint>=3.2.0",
+    "mypy>=1.14.0"
+]
+
+[tool.setuptools]
+packages = ["scripts"]
+
+[tool.setuptools.package-data]
+scripts = ["kafka-resources.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["scripts/tests"]
+python_files = ["test_*.py"]
+addopts = "--cov=scripts --cov-report=html --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["scripts"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == \"__main__\":"
+]
+precision = 2
+
+[tool.mypy]
+python_version = "3.14.7"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[tool.pylint.messages_control]
+max_line_length = 100
+disable = ["missing-docstring"]
+
+[tool.black]
+line_length = 100
+target_version = ["py314"]
