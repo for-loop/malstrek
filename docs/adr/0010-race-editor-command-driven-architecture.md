@@ -5,33 +5,21 @@
 
 ## Context
 
-We have decided to build the race-editor as a separate application module from the Java console app and separate from the future pre-race admin service. The next architectural decision is how the editor service itself should be structured internally.
+The race-editor is a separate application concern from the Java console app and from the future pre-race admin service. It is a browser-based, multi-user operational tool used during a race to correct finisher data without writing SQL.
 
-The race-editor must support the following MVP operations during a race:
+The editor shares the same ecosystem as the console app and the same database, but it is not the same workflow. The console app is optimized for live event capture; the editor is optimized for correction, validation, auditability, and safe operator workflows.
 
-- list the current finishers for a selected race
-- update a bib number from null to a valid numeric value
-- update a bib number from a numeric value to a different numeric value
-- update a bib number from a numeric value to null
-- update a finish timestamp when the Enter key was pressed at the wrong time
-- soft delete a duplicate finisher row when a runner re-enters and finishes again
-- undelete soft-deleted row by mistake
-- validate edits before they are persisted
-- maintain a clear audit trail of corrections
+The editor must support:
+- race-scoped correction during a race
+- safe mutation of finisher data
+- explicit audit of changes
+- future extension to broader race administration without coupling the whole system to the editor
 
-The requirement is not merely to expose a form over the database. The domain has business rules, validation concerns, and operator safety requirements. A raw SQL layer would make it easy to introduce mistakes, hide validation intent, and create unmaintainable code.
-
-## Domain invariants
-
-- `deleted` is a first-class domain state.
-- `deleted = true` and `deleted = false` are both valid operational states.
-- Soft delete and undelete are both correction commands.
-- `bib_number` and `timestamp` are editable only when `deleted = false`.
-- `deleted` itself remains editable so a mistaken soft delete can be undone.
+The MVP scope is intentionally narrow: one race at a time, with a browser UI and a backend API.
 
 ## Decision
 
-The race-editor backend will use a command-driven architecture built around Clean Architecture boundaries.
+We will implement the race-editor as a separate application module with a command-driven backend built around Clean Architecture boundaries.
 
 The service will be structured as:
 
@@ -42,137 +30,99 @@ The service will be structured as:
 
 - Application layer
   - commands and use cases
-  - validation rules
-  - orchestration of domain logic
+  - validation
+  - orchestration of corrections
   - transaction boundaries
 
 - Domain layer
-  - entities
-  - value objects
-  - domain services
-  - correction policies
-  - validation logic
-  - business rules for soft delete, timestamps, and bib updates
+  - finisher correction rules
+  - state transitions
+  - validation policies
+  - domain invariants
+  - audit-oriented business logic
 
 - Persistence layer
-  - repository interfaces in the application/domain layers
-  - concrete implementations in infrastructure
-  - TimescaleDB access is isolated behind adapters
+  - repository interfaces in the inner layers
+  - concrete TimescaleDB implementations in infrastructure
+  - no direct database writes from the UI
 
-The backend will expose operations as commands rather than direct database updates. Examples include:
-
+The editor backend will expose operations as commands instead of ad hoc SQL updates. Examples include:
 - `UpdateFinisherBibCommand`
 - `UpdateFinisherTimestampCommand`
-- `SoftDeleteDuplicateFinisherCommand`
+- `SoftDeleteFinisherCommand`
 - `UndeleteFinisherCommand`
-- `ListRaceFinishersQuery`
 
-Each command will be validated and handled by an application service or use case. The UI will not talk to TimescaleDB directly and will not contain domain logic.
+The UI will not directly manipulate the database. It will send commands to the backend, and the backend will validate and apply domain rules before persisting changes.
 
 ## Rationale
 
-This decision supports the requirements for:
+This architecture is the correct fit for the project requirements because:
 
-- safety
-- maintainability
-- testability
-- future extension
-- separation of concerns
+- it keeps the UI and database decoupled
+- it enforces validation and business rules in one place
+- it supports audit, safety, and operator workflows
+- it is suitable for a multi-user browser app
+- it keeps the core domain independent from the database and web layer
+- it avoids the fragility of raw SQL updates
+- it allows future extension into pre-race admin or broader race operations without reworking the product boundary
 
-A command-driven API is a better fit than direct SQL writes because:
-
-- edits are explicit and intentional
-- validation can be enforced at the application/domain boundary
-- one change in business rules is centralized instead of duplicated in UI code or SQL
-- the code becomes easier to test with unit and integration tests
-- audit behavior can be added consistently
-
-Clean Architecture is appropriate because:
-
-- the domain layer remains independent from infrastructure and UI
-- database access, Kafka, and external services are implementation details
-- future requirements such as approvals, role-based permissions, and audit logs can be introduced without rewriting the domain model
-
-This also aligns with SOLID and the project coding guidelines:
-- each class has a clear responsibility
-- dependencies point inward
-- persistence is abstracted behind interfaces
-- logic is centralized instead of spread across UI and database code
+This decision also aligns with Clean Architecture, SOLID, and the project’s intent to keep the editor maintainable and extensible.
 
 ## Scope
 
-This ADR is intentionally scoped to the race-editor service.
+This ADR is intentionally scoped to the race-editor service architecture.
 
 It does not decide:
-- the eventual frontend framework
-- the eventual backend language or runtime
+- the exact frontend framework
+- the exact backend language or runtime
 - the final authorization model
-- the exact audit log storage mechanism
-- whether pre-race admin is a separate runtime service beyond the current decision
+- the exact audit persistence format
+- the broader pre-race admin architecture
 
-Those topics remain open and should be addressed separately when needed.
+Those topics can be addressed in later ADRs as needed.
 
 ## Consequences
 
 ### Positive consequences
 
-- Operators are not required to write SQL
-- Correction logic is centralized and easier to reason about
-- Validation can be consistent across all edit operations
-- Domain rules are testable without database wiring
-- The editor can be extended with approval, audit, and permission logic later
-- The system becomes easier to maintain as race administration grows
+- Correction logic is explicit and centralized
+- Operators do not need to write SQL
+- Validation is safer and easier to test
+- The UI remains decoupled from the database
+- The backend can support audit and role-based rules later
+- The system is more maintainable as the admin capability grows
 
 ### Negative consequences
 
-- More upfront structure is required than a quick direct SQL update path
-- The UI/backend split introduces more code than a small local script
-- We must maintain clear contracts between UI, application, and persistence layers
+- More structure and ceremony than a small direct SQL approach
+- Additional service boundaries and contracts to maintain
+- The team must keep the UI, application, and domain layers disciplined
 
 ## Alternatives considered
 
-### 1. Direct SQL updates from the UI or a service layer
+### 1. Direct raw SQL updates from the editor or a service
 
-This is the current practice and is the simplest to start, but it is unsafe and hard to validate. It also exposes business rules to the database layer and requires operator knowledge of SQL.
+This is the current dangerous pattern. It is simple to start but makes the system fragile and hard to reason about.
 
-Rejected because it violates the operational safety requirement and is difficult to extend.
+Rejected because it exposes database logic to operators and makes validation and correction flows unsafe.
 
-### 2. CRUD-style repository API without command-driven use cases
+### 2. Put all logic in the UI
 
-This would reduce some duplication, but it would still leave validation and correction policy spread across shallow service methods. It is not expressive enough for workflow-heavy edits such as soft-deletes, timestamp corrections, and rule-based validation.
-
-Rejected because it is not sufficiently domain-driven.
-
-### 3. Put all logic in the UI
-
-This would make the frontend responsible for data integrity and domain logic. That would tightly couple the user interface to the business rules and make testing and reuse harder.
+This would couple validation and business rules to the browser and make the domain harder to test and extend.
 
 Rejected because it violates Clean Architecture and separation of concerns.
 
-## Implementation guidance
+### 3. Keep the editor as a utility inside the Java console app
 
-The race-editor should follow a layered structure similar to:
+This would blur responsibilities and make the editor unsuitable for multi-user browser operation.
 
-- `apps/race-editor-ui`
-- `apps/race-editor-api`
-- `libs/race-editor-domain`
-- `libs/race-editor-application`
-- `libs/race-editor-persistence`
-
-The core rule is:
-
-- UI sends commands
-- application layer validates and orchestrates
-- domain owns business rules
-- repository interfaces are used for persistence
-
-This is intentionally a domain-first design that supports future race administration features without forcing them into the same process or code path.
+Rejected because it does not match the required workflow or product boundary.
 
 ## Related ADRs
 
 - ADR 0009: Keep race administration in the same repo, but separate by app and service boundary
-- ADR 0008: Use TimescaleDB as Primary Application Database
+- ADR 0011: Define the race-editor domain model and MVP use cases
 
 ## Notes
 
-This ADR is the first explicit design decision for the race-editor service itself. It is intentionally narrow and aims to give us a safe, testable, extendable foundation for live race corrections without locking in unrelated decisions for future pre-race admin capabilities.
+This ADR is intentionally about the internal structure of the race-editor. The domain-level rules and correction workflow are defined separately in ADR 0011 so that each ADR has a clear purpose and does not become a mixed bag of architecture and business rules.
