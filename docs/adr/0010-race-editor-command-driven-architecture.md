@@ -15,10 +15,19 @@ The race-editor must support the following MVP operations during a race:
 - update a bib number from a numeric value to null
 - update a finish timestamp when the Enter key was pressed at the wrong time
 - soft delete a duplicate finisher row when a runner re-enters and finishes again
+- undelete soft-deleted row by mistake
 - validate edits before they are persisted
 - maintain a clear audit trail of corrections
 
 The requirement is not merely to expose a form over the database. The domain has business rules, validation concerns, and operator safety requirements. A raw SQL layer would make it easy to introduce mistakes, hide validation intent, and create unmaintainable code.
+
+## Domain invariants
+
+- `deleted` is a first-class domain state.
+- `deleted = true` and `deleted = false` are both valid operational states.
+- Soft delete and undelete are both correction commands.
+- `bib_number` and `timestamp` are editable only when `deleted = false`.
+- `deleted` itself remains editable so a mistaken soft delete can be undone.
 
 ## Decision
 
@@ -55,6 +64,7 @@ The backend will expose operations as commands rather than direct database updat
 - `UpdateFinisherBibCommand`
 - `UpdateFinisherTimestampCommand`
 - `SoftDeleteDuplicateFinisherCommand`
+- `UndeleteFinisherCommand`
 - `ListRaceFinishersQuery`
 
 Each command will be validated and handled by an application service or use case. The UI will not talk to TimescaleDB directly and will not contain domain logic.
