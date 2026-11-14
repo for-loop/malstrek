@@ -63,7 +63,7 @@ def test_load_adr_records_rejects_numbered_filename_without_four_digits(tmp_path
         encoding="utf-8",
     )
 
-    with pytest.raises(ValueError, match="002-example-decision.md.*four-digit ADR filename"):
+    with pytest.raises(ValueError, match=malformed_filename):
         load_adr_records(tmp_path)
 
 
