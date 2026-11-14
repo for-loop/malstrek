@@ -2,6 +2,7 @@
 
 **Date:** 2025  
 **Status:** Accepted  
+**Summary:** Persist Kafka race events to the relational database with Kafka JDBC Sink Connector.
 **Deciders:** studio a priori
 
 ## Context

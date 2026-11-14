@@ -2,6 +2,7 @@
 
 **Date:** 2025  
 **Status:** Accepted  
+**Summary:** Build the application with Java 17 and Gradle.
 **Deciders:** studio a priori
 
 ## Context

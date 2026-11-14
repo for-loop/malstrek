@@ -1,6 +1,7 @@
 # ADR 0010: Use a command-driven race-editor backend with Clean Architecture
 
 - Status: Accepted
+- Summary: Build the race-editor backend around command-driven use cases and Clean Architecture boundaries.
 - Date: 2026-09-27
 
 ## Context
