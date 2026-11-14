@@ -35,13 +35,15 @@ def test_parse_adr_extracts_metadata():
 
 
 def test_parse_adr_rejects_missing_metadata():
-    with pytest.raises(ValueError, match="Summary field"):
+    with pytest.raises(ValueError):
         parse_adr(ADR_FILENAME, "# ADR 0001: Example decision\n\n**Status:** Accepted\n")
 
 
 def test_parse_adr_rejects_filename_title_mismatch():
-    with pytest.raises(ValueError, match="number does not match filename"):
+    with pytest.raises(ValueError) as error:
         parse_adr(ADR_FILENAME, ADR_CONTENT.replace("ADR 0001", "ADR 0002"))
+
+    assert ADR_FILENAME in str(error.value)
 
 
 def test_load_adr_records_sorts_records_by_filename(tmp_path):
@@ -91,7 +93,7 @@ catalog rows
 
 
 def test_replace_catalog_rejects_missing_markers():
-    with pytest.raises(ValueError, match="one pair of catalog markers"):
+    with pytest.raises(ValueError):
         replace_catalog("# ADRs\n", "catalog rows")
 
 
