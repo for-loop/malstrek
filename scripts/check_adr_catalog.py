@@ -21,6 +21,7 @@ SUMMARY_PATTERN = re.compile(
     re.MULTILINE,
 )
 ADR_FILE_PATTERN = re.compile(r"(\d{4})-.+\.md$")
+NUMBERED_ADR_FILE_PATTERN = re.compile(r"\d+-.*\.md$")
 
 
 @dataclass(frozen=True)
@@ -64,7 +65,11 @@ def parse_adr(filename, content):
 
 
 def load_adr_records(adr_directory):
-    paths = sorted(adr_directory.glob("[0-9][0-9][0-9][0-9]-*.md"))
+    paths = sorted(
+        path
+        for path in adr_directory.glob("*.md")
+        if NUMBERED_ADR_FILE_PATTERN.fullmatch(path.name)
+    )
     records = [parse_adr(path.name, path.read_text(encoding="utf-8")) for path in paths]
     identifiers = [record.identifier for record in records]
     if len(identifiers) != len(set(identifiers)):

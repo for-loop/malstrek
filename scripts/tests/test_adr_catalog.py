@@ -56,6 +56,17 @@ def test_load_adr_records_sorts_records_by_filename(tmp_path):
     assert [record.identifier for record in records] == ["0001", "0002"]
 
 
+def test_load_adr_records_rejects_numbered_filename_without_four_digits(tmp_path):
+    malformed_filename = "002-example-decision.md"
+    (tmp_path / malformed_filename).write_text(
+        ADR_CONTENT.replace("0001", "002"),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="002-example-decision.md.*four-digit ADR filename"):
+        load_adr_records(tmp_path)
+
+
 def test_render_catalog_creates_linked_markdown_rows():
     catalog = render_catalog(
         [AdrRecord("0001", ADR_FILENAME, "Example decision", "Accepted", "Summary.")]
