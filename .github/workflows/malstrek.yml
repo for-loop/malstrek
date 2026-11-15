@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Verify ADR catalog
+        run: python3 scripts/adr_catalog/generate_adr_catalog.py --check
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:

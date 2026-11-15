@@ -1,6 +1,7 @@
 # ADR 0009: Keep race administration in the same repo, but separate by app and service boundary
 
 - Status: Accepted
+- Summary: Keep race administration in this repository while separating the console, admin API, and UI into distinct apps.
 - Date: 2026-09-27
 
 ## Context

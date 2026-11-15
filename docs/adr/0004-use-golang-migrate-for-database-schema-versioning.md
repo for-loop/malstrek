@@ -2,6 +2,7 @@
 
 **Date:** 2025  
 **Status:** Accepted  
+**Summary:** Manage database schema changes with versioned, reversible golang-migrate SQL migrations.
 **Deciders:** studio a priori
 
 ## Context

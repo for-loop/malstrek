@@ -2,6 +2,7 @@
 
 **Date:** 2025  
 **Status:** Accepted  
+**Summary:** Use Docker multi-stage builds to package the application and its supporting tools.
 **Deciders:** studio a priori
 
 ## Context

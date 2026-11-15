@@ -2,6 +2,7 @@
 
 **Date:** 2026-05-24  
 **Status:** Accepted  
+**Summary:** Adopt TimescaleDB as the primary application database for race data and corrections.
 **Deciders:** studio a priori
 
 ## Context

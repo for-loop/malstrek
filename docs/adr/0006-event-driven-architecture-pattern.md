@@ -2,6 +2,7 @@
 
 **Date:** 2025  
 **Status:** Accepted  
+**Summary:** Use asynchronous events to decouple producers from database, analytics, and future consumers.
 **Deciders:** studio a priori
 
 ## Context

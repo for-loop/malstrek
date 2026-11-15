@@ -2,6 +2,7 @@
 
 **Date:** 2025  
 **Status:** Accepted  
+**Summary:** Use Apache Avro and Schema Registry to serialize race events with governed schemas.
 **Deciders:** studio a priori
 
 ## Context

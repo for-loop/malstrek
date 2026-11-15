@@ -1,6 +1,7 @@
 # ADR 0011: Define the race-editor domain model and MVP use cases
 
 - Status: Accepted
+- Summary: Model finisher corrections as explicit domain operations with nullable bibs, soft deletion, and audit entries.
 - Date: 2026-09-27
 
 ## Context

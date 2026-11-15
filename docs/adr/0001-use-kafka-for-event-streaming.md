@@ -2,6 +2,7 @@
 
 **Date:** 2025  
 **Status:** Accepted  
+**Summary:** Use Kafka and Schema Registry to reliably distribute race events to downstream consumers.
 **Deciders:** studio a priori
 
 ## Context
