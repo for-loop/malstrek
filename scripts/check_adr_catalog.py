@@ -11,13 +11,13 @@ ADR_DIRECTORY = ROOT / "docs" / "adr"
 INDEX_PATH = ADR_DIRECTORY / "README.md"
 START_MARKER = "<!-- ADR-CATALOG:START -->"
 END_MARKER = "<!-- ADR-CATALOG:END -->"
-TITLE_PATTERN = re.compile(r"^# ADR (\d{4}): (.+?)\s*$", re.MULTILINE)
+TITLE_PATTERN = re.compile(r"^# ADR (\d{4}):[ \t]*(.*?)[ \t]*$", re.MULTILINE)
 STATUS_PATTERN = re.compile(
-    r"^(?:[-*]\s*)?(?:\*\*)?Status:(?:\*\*)?\s*(.+?)\s*$",
+    r"^(?:[-*][ \t]*)?(?:\*\*)?Status:(?:\*\*)?[ \t]*(.*?)[ \t]*$",
     re.MULTILINE,
 )
 SUMMARY_PATTERN = re.compile(
-    r"^(?:[-*]\s*)?(?:\*\*)?Summary:(?:\*\*)?\s*(.+?)\s*$",
+    r"^(?:[-*][ \t]*)?(?:\*\*)?Summary:(?:\*\*)?[ \t]*(.*?)[ \t]*$",
     re.MULTILINE,
 )
 ADR_FILE_PATTERN = re.compile(r"(\d{4})-.+\.md$")
@@ -51,6 +51,21 @@ def parse_adr(filename, content):
     if missing:
         raise ValueError(f"{filename} is missing " + ", ".join(missing))
 
+    title = title_match.group(2).strip()
+    status = status_match.group(1).strip()
+    summary = summary_match.group(1).strip()
+    blank_fields = [
+        field
+        for field, value in (
+            ("title", title),
+            ("Status", status),
+            ("Summary", summary),
+        )
+        if not value
+    ]
+    if blank_fields:
+        raise ValueError(f"{filename} has blank fields: " + ", ".join(blank_fields))
+
     identifier = filename_match.group(1)
     if title_match.group(1) != identifier:
         raise ValueError(f"{filename} title number does not match filename")
@@ -58,9 +73,9 @@ def parse_adr(filename, content):
     return AdrRecord(
         identifier=identifier,
         filename=filename,
-        title=title_match.group(2).strip(),
-        status=status_match.group(1).strip(),
-        summary=summary_match.group(1).strip(),
+        title=title,
+        status=status,
+        summary=summary,
     )
 
 

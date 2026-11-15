@@ -34,6 +34,52 @@ def test_parse_adr_extracts_metadata():
     )
 
 
+@pytest.mark.parametrize(
+    ("field", "line"),
+    [
+        ("title", "# ADR 0001: "),
+        ("status", "**Status:**"),
+        ("summary", "**Summary:**"),
+    ],
+)
+@pytest.mark.parametrize("value", ["", "   "])
+def test_parse_adr_rejects_empty_or_whitespace_metadata(field, line, value):
+    content = ADR_CONTENT.replace(
+        {
+            "title": "# ADR 0001: Example decision",
+            "status": "**Status:** Accepted",
+            "summary": "**Summary:** A concise decision summary.",
+        }[field],
+        line + value,
+    )
+
+    with pytest.raises(ValueError):
+        parse_adr(ADR_FILENAME, content)
+
+
+def test_parse_adr_trims_metadata_fields():
+    content = (
+        ADR_CONTENT.replace(
+            "# ADR 0001: Example decision",
+            "# ADR 0001:   Example decision  ",
+        )
+        .replace(
+            "**Status:** Accepted",
+            "**Status:**   Accepted  ",
+        )
+        .replace(
+            "**Summary:** A concise decision summary.",
+            "**Summary:**   A concise decision summary.  ",
+        )
+    )
+
+    record = parse_adr(ADR_FILENAME, content)
+
+    assert record.title == "Example decision"
+    assert record.status == "Accepted"
+    assert record.summary == "A concise decision summary."
+
+
 def test_parse_adr_rejects_missing_metadata():
     with pytest.raises(ValueError):
         parse_adr(ADR_FILENAME, "# ADR 0001: Example decision\n\n**Status:** Accepted\n")
