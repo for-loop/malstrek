@@ -150,6 +150,25 @@ def test_render_catalog_creates_linked_markdown_rows():
     ]
 
 
+def test_render_catalog_escapes_pipes_in_title_and_summary():
+    catalog = render_catalog(
+        [
+            AdrRecord(
+                "0001",
+                ADR_FILENAME,
+                "Race | timing",
+                "Accepted",
+                "Capture start | finish events.",
+            )
+        ]
+    )
+
+    assert (
+        catalog.splitlines()[2] == f"| [0001]({ADR_FILENAME}) | Race \\| timing | Accepted "
+        "| Capture start \\| finish events. |"
+    )
+
+
 def test_replace_catalog_preserves_content_outside_markers():
     updated = replace_catalog(ADR_README, "catalog rows")
 

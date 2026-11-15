@@ -124,6 +124,10 @@ def load_adr_records(adr_directory):
     return records
 
 
+def escape_table_cell(value):
+    return value.replace("\\", "\\\\").replace("|", "\\|")
+
+
 def render_catalog(records):
     rows = [
         "| ID | Title | Status | Summary |",
@@ -132,7 +136,8 @@ def render_catalog(records):
     for record in records:
         rows.append(
             f"| [{record.identifier}]({record.filename}) "
-            f"| {record.title} | {record.status} | {record.summary} |"
+            f"| {escape_table_cell(record.title)} | {record.status} "
+            f"| {escape_table_cell(record.summary)} |"
         )
     return "\n".join(rows)
 
