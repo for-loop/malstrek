@@ -6,7 +6,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 ADR_DIRECTORY = ROOT / "docs" / "adr"
 INDEX_PATH = ADR_DIRECTORY / "README.md"
 START_MARKER = "<!-- ADR-CATALOG:START -->"
@@ -184,7 +184,10 @@ def execute_catalog_command(check, adr_directory, index_path):
     generated = replace_status_definitions(replace_catalog(current, catalog))
     if check:
         if current != generated:
-            print("ADR catalog is out of date; run python3 scripts/check_adr_catalog.py.")
+            print(
+                "ADR catalog is out of date; "
+                "run python3 scripts/adr_catalog/check_adr_catalog.py."
+            )
             return 1
         print("ADR catalog is up to date.")
         return 0
