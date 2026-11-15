@@ -1,6 +1,6 @@
 import pytest
 
-from scripts.adr_catalog.check_adr_catalog import (
+from scripts.adr_catalog.generate_adr_catalog import (
     AdrRecord,
     STATUS_DEFINITIONS,
     load_adr_records,

@@ -7,9 +7,9 @@ Each numbered ADR is the source of truth for its title, status, and summary.
 
 The catalog and status definitions below are generated from the ADR files and catalog tool.
 After adding an ADR or changing its status or summary, run
-`python3 scripts/adr_catalog/check_adr_catalog.py` to regenerate this file. To add or
+`python3 scripts/adr_catalog/generate_adr_catalog.py` to regenerate this file. To add or
 change an allowed status, update `STATUS_DEFINITIONS` in
-`scripts/adr_catalog/check_adr_catalog.py` and regenerate.
+`scripts/adr_catalog/generate_adr_catalog.py` and regenerate.
 
 <!-- ADR-CATALOG:START -->
 | ID | Title | Status | Summary |

@@ -186,7 +186,7 @@ def execute_catalog_command(check, adr_directory, index_path):
         if current != generated:
             print(
                 "ADR catalog is out of date; "
-                "run python3 scripts/adr_catalog/check_adr_catalog.py."
+                "run python3 scripts/adr_catalog/generate_adr_catalog.py."
             )
             return 1
         print("ADR catalog is up to date.")
