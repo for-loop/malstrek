@@ -127,15 +127,26 @@ def test_load_adr_records_sorts_records_by_filename(tmp_path):
     assert [record.identifier for record in records] == ["0001", "0002"]
 
 
-def test_load_adr_records_rejects_numbered_filename_without_four_digits(tmp_path):
-    malformed_filename = "002-example-decision.md"
+@pytest.mark.parametrize(
+    "malformed_filename",
+    ["002-example-decision.md", "0001_example-decision.md", "0001.md"],
+)
+def test_load_adr_records_rejects_malformed_numbered_filename(tmp_path, malformed_filename):
     (tmp_path / malformed_filename).write_text(
         ADR_CONTENT.replace("0001", "002"),
         encoding="utf-8",
     )
 
-    with pytest.raises(ValueError, match=malformed_filename):
+    with pytest.raises(ValueError) as error:
         load_adr_records(tmp_path)
+
+    assert malformed_filename in str(error.value)
+
+
+def test_load_adr_records_ignores_unnumbered_markdown_files(tmp_path):
+    (tmp_path / "notes.md").write_text("Not an ADR.", encoding="utf-8")
+
+    assert load_adr_records(tmp_path) == []
 
 
 def test_render_catalog_creates_linked_markdown_rows():

@@ -30,7 +30,7 @@ SUMMARY_PATTERN = re.compile(
     re.MULTILINE,
 )
 ADR_FILE_PATTERN = re.compile(r"(\d{4})-.+\.md$")
-NUMBERED_ADR_FILE_PATTERN = re.compile(r"\d+-.*\.md$")
+NUMBERED_ADR_FILE_PATTERN = re.compile(r"\d+.*\.md$")
 
 
 @dataclass(frozen=True)
