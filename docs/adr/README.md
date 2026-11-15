@@ -5,8 +5,10 @@ Each numbered ADR is the source of truth for its title, status, and summary.
 
 ## Decision Records
 
-The catalog below is generated from the ADR files. After adding an ADR or changing its
-status or summary, run `python3 scripts/check_adr_catalog.py` to regenerate the catalog.
+The catalog and status definitions below are generated from the ADR files and catalog tool.
+After adding an ADR or changing its status or summary, run
+`python3 scripts/check_adr_catalog.py` to regenerate this file. To add or change an allowed
+status, update `STATUS_DEFINITIONS` in `scripts/check_adr_catalog.py` and regenerate.
 
 <!-- ADR-CATALOG:START -->
 | ID | Title | Status | Summary |
@@ -26,10 +28,12 @@ status or summary, run `python3 scripts/check_adr_catalog.py` to regenerate the 
 
 ## Decision Status
 
+<!-- ADR-STATUSES:START -->
 - **Proposed**: Under consideration
 - **Accepted**: The decision is currently in force
 - **Superseded**: Replaced or amended by a later ADR, which should be referenced
 - **Deprecated**: No longer applicable
+<!-- ADR-STATUSES:END -->
 
 ## Creating an ADR
 

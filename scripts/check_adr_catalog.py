@@ -11,6 +11,15 @@ ADR_DIRECTORY = ROOT / "docs" / "adr"
 INDEX_PATH = ADR_DIRECTORY / "README.md"
 START_MARKER = "<!-- ADR-CATALOG:START -->"
 END_MARKER = "<!-- ADR-CATALOG:END -->"
+STATUS_START_MARKER = "<!-- ADR-STATUSES:START -->"
+STATUS_END_MARKER = "<!-- ADR-STATUSES:END -->"
+STATUS_DEFINITIONS = (
+    ("Proposed", "Under consideration"),
+    ("Accepted", "The decision is currently in force"),
+    ("Superseded", "Replaced or amended by a later ADR, which should be referenced"),
+    ("Deprecated", "No longer applicable"),
+)
+VALID_STATUSES = {status for status, _ in STATUS_DEFINITIONS}
 TITLE_PATTERN = re.compile(r"^# ADR (\d{4}):[ \t]*(.*?)[ \t]*$", re.MULTILINE)
 STATUS_PATTERN = re.compile(
     r"^(?:[-*][ \t]*)?(?:\*\*)?Status:(?:\*\*)?[ \t]*(.*?)[ \t]*$",
@@ -65,6 +74,11 @@ def parse_adr(filename, content):
     ]
     if blank_fields:
         raise ValueError(f"{filename} has blank fields: " + ", ".join(blank_fields))
+    if status not in VALID_STATUSES:
+        raise ValueError(
+            f"{filename} has unrecognized status {status!r}; "
+            f"expected one of: {', '.join(status for status, _ in STATUS_DEFINITIONS)}"
+        )
 
     identifier = filename_match.group(1)
     if title_match.group(1) != identifier:
@@ -105,13 +119,30 @@ def render_catalog(records):
     return "\n".join(rows)
 
 
-def replace_catalog(content, catalog):
-    if content.count(START_MARKER) != 1 or content.count(END_MARKER) != 1:
-        raise ValueError("ADR README must contain one pair of catalog markers")
+def render_status_definitions():
+    return "\n".join(f"- **{status}**: {description}" for status, description in STATUS_DEFINITIONS)
 
-    before, remainder = content.split(START_MARKER, 1)
-    _, after = remainder.split(END_MARKER, 1)
-    return f"{before}{START_MARKER}\n{catalog}\n{END_MARKER}{after}"
+
+def replace_section(content, start_marker, end_marker, section_content):
+    if content.count(start_marker) != 1 or content.count(end_marker) != 1:
+        raise ValueError("ADR README must contain one pair of section markers")
+
+    before, remainder = content.split(start_marker, 1)
+    _, after = remainder.split(end_marker, 1)
+    return f"{before}{start_marker}\n{section_content}\n{end_marker}{after}"
+
+
+def replace_catalog(content, catalog):
+    return replace_section(content, START_MARKER, END_MARKER, catalog)
+
+
+def replace_status_definitions(content):
+    return replace_section(
+        content,
+        STATUS_START_MARKER,
+        STATUS_END_MARKER,
+        render_status_definitions(),
+    )
 
 
 def parse_arguments(arguments=None):
@@ -128,7 +159,7 @@ def run(check, adr_directory=ADR_DIRECTORY, index_path=INDEX_PATH):
     try:
         current = index_path.read_text(encoding="utf-8")
         catalog = render_catalog(load_adr_records(adr_directory))
-        generated = replace_catalog(current, catalog)
+        generated = replace_status_definitions(replace_catalog(current, catalog))
     except (OSError, ValueError) as error:
         print(f"ADR catalog error: {error}", file=sys.stderr)
         return 1

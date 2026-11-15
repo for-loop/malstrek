@@ -2,9 +2,11 @@ import pytest
 
 from scripts.check_adr_catalog import (
     AdrRecord,
+    STATUS_DEFINITIONS,
     load_adr_records,
     parse_adr,
     render_catalog,
+    render_status_definitions,
     replace_catalog,
     run,
 )
@@ -19,6 +21,11 @@ ADR_README = """# ADRs
 
 <!-- ADR-CATALOG:START -->
 <!-- ADR-CATALOG:END -->
+
+## Decision Status
+
+<!-- ADR-STATUSES:START -->
+<!-- ADR-STATUSES:END -->
 """
 
 
@@ -32,6 +39,22 @@ def test_parse_adr_extracts_metadata():
         status="Accepted",
         summary="A concise decision summary.",
     )
+
+
+@pytest.mark.parametrize("status", [status for status, _ in STATUS_DEFINITIONS])
+def test_parse_adr_accepts_documented_statuses(status):
+    content = ADR_CONTENT.replace("Accepted", status)
+
+    assert parse_adr(ADR_FILENAME, content).status == status
+
+
+def test_parse_adr_rejects_unrecognized_status():
+    content = ADR_CONTENT.replace("Accepted", "Accepetd")
+
+    with pytest.raises(ValueError) as error:
+        parse_adr(ADR_FILENAME, content)
+
+    assert ADR_FILENAME in str(error.value)
 
 
 @pytest.mark.parametrize(
@@ -135,12 +158,24 @@ def test_replace_catalog_preserves_content_outside_markers():
 <!-- ADR-CATALOG:START -->
 catalog rows
 <!-- ADR-CATALOG:END -->
+
+## Decision Status
+
+<!-- ADR-STATUSES:START -->
+<!-- ADR-STATUSES:END -->
 """
 
 
 def test_replace_catalog_rejects_missing_markers():
     with pytest.raises(ValueError):
         replace_catalog("# ADRs\n", "catalog rows")
+
+
+def test_render_status_definitions_includes_all_allowed_statuses():
+    rendered = render_status_definitions()
+
+    for status, description in STATUS_DEFINITIONS:
+        assert f"- **{status}**: {description}" in rendered
 
 
 def test_run_generates_index_from_adr_sources(tmp_path, capsys):
@@ -153,7 +188,9 @@ def test_run_generates_index_from_adr_sources(tmp_path, capsys):
     result = run(False, adr_directory, index_path)
 
     assert result == 0
-    assert "Example decision" in index_path.read_text(encoding="utf-8")
+    generated_index = index_path.read_text(encoding="utf-8")
+    assert "Example decision" in generated_index
+    assert render_status_definitions() in generated_index
     assert "Generated README.md." in capsys.readouterr().out
 
 
