@@ -178,15 +178,10 @@ def parse_arguments(arguments=None):
     return parser.parse_args(arguments)
 
 
-def run(check, adr_directory=ADR_DIRECTORY, index_path=INDEX_PATH):
-    try:
-        current = index_path.read_text(encoding="utf-8")
-        catalog = render_catalog(load_adr_records(adr_directory))
-        generated = replace_status_definitions(replace_catalog(current, catalog))
-    except (OSError, ValueError) as error:
-        print(f"ADR catalog error: {error}", file=sys.stderr)
-        return 1
-
+def execute_catalog_command(check, adr_directory, index_path):
+    current = index_path.read_text(encoding="utf-8")
+    catalog = render_catalog(load_adr_records(adr_directory))
+    generated = replace_status_definitions(replace_catalog(current, catalog))
     if check:
         if current != generated:
             print("ADR catalog is out of date; run python3 scripts/check_adr_catalog.py.")
@@ -194,14 +189,17 @@ def run(check, adr_directory=ADR_DIRECTORY, index_path=INDEX_PATH):
         print("ADR catalog is up to date.")
         return 0
 
-    try:
-        index_path.write_text(generated, encoding="utf-8")
-    except OSError as error:
-        print(f"ADR catalog error: {error}", file=sys.stderr)
-        return 1
-
+    index_path.write_text(generated, encoding="utf-8")
     print(f"Generated {index_path.name}.")
     return 0
+
+
+def run(check, adr_directory=ADR_DIRECTORY, index_path=INDEX_PATH):
+    try:
+        return execute_catalog_command(check, adr_directory, index_path)
+    except (OSError, ValueError) as error:
+        print(f"ADR catalog error: {error}", file=sys.stderr)
+        return 1
 
 
 def main():
