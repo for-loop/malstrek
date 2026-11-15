@@ -127,6 +127,14 @@ def test_load_adr_records_sorts_records_by_filename(tmp_path):
     assert [record.identifier for record in records] == ["0001", "0002"]
 
 
+def test_load_adr_records_rejects_duplicate_identifiers(tmp_path):
+    (tmp_path / "0001-first-decision.md").write_text(ADR_CONTENT, encoding="utf-8")
+    (tmp_path / "0001-another-decision.md").write_text(ADR_CONTENT, encoding="utf-8")
+
+    with pytest.raises(ValueError):
+        load_adr_records(tmp_path)
+
+
 @pytest.mark.parametrize(
     "malformed_filename",
     ["002-example-decision.md", "0001_example-decision.md", "0001.md"],
