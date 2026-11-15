@@ -213,6 +213,26 @@ def test_run_generates_index_from_adr_sources(tmp_path, capsys):
     assert "Generated README.md." in capsys.readouterr().out
 
 
+def test_run_reports_index_write_failure(tmp_path, monkeypatch, capsys):
+    adr_directory = tmp_path / "adr"
+    adr_directory.mkdir()
+    (adr_directory / ADR_FILENAME).write_text(ADR_CONTENT, encoding="utf-8")
+    index_path = adr_directory / "README.md"
+    index_path.write_text(ADR_README, encoding="utf-8")
+
+    def fail_write(*_args, **_kwargs):
+        raise OSError("permission denied")
+
+    monkeypatch.setattr(type(index_path), "write_text", fail_write)
+
+    result = run(False, adr_directory, index_path)
+
+    captured = capsys.readouterr()
+    assert result == 1
+    assert "permission denied" in captured.err
+    assert "Generated" not in captured.out
+
+
 def test_run_check_reports_stale_index_without_writing(tmp_path, capsys):
     adr_directory = tmp_path / "adr"
     adr_directory.mkdir()

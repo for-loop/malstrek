@@ -194,7 +194,12 @@ def run(check, adr_directory=ADR_DIRECTORY, index_path=INDEX_PATH):
         print("ADR catalog is up to date.")
         return 0
 
-    index_path.write_text(generated, encoding="utf-8")
+    try:
+        index_path.write_text(generated, encoding="utf-8")
+    except OSError as error:
+        print(f"ADR catalog error: {error}", file=sys.stderr)
+        return 1
+
     print(f"Generated {index_path.name}.")
     return 0
 
