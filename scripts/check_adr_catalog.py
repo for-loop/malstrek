@@ -42,15 +42,20 @@ class AdrRecord:
     summary: str
 
 
-def parse_adr(filename, content):
-    filename_match = ADR_FILE_PATTERN.fullmatch(filename)
+@dataclass(frozen=True)
+class AdrMetadata:
+    identifier: str
+    title: str
+    status: str
+    summary: str
+
+
+def parse_adr_metadata(filename, content):
     title_match = TITLE_PATTERN.search(content)
     status_match = STATUS_PATTERN.search(content)
     summary_match = SUMMARY_PATTERN.search(content)
 
     missing = []
-    if filename_match is None:
-        missing.append("four-digit ADR filename")
     if title_match is None:
         missing.append("title in '# ADR NNNN: Title' format")
     if status_match is None:
@@ -60,36 +65,49 @@ def parse_adr(filename, content):
     if missing:
         raise ValueError(f"{filename} is missing " + ", ".join(missing))
 
-    title = title_match.group(2).strip()
-    status = status_match.group(1).strip()
-    summary = summary_match.group(1).strip()
+    return AdrMetadata(
+        identifier=title_match.group(1),
+        title=title_match.group(2).strip(),
+        status=status_match.group(1).strip(),
+        summary=summary_match.group(1).strip(),
+    )
+
+
+def validate_adr_metadata(filename, metadata):
+    filename_match = ADR_FILE_PATTERN.fullmatch(filename)
+    if filename_match is None:
+        raise ValueError(f"{filename} is missing a four-digit ADR filename")
+
     blank_fields = [
         field
         for field, value in (
-            ("title", title),
-            ("Status", status),
-            ("Summary", summary),
+            ("title", metadata.title),
+            ("Status", metadata.status),
+            ("Summary", metadata.summary),
         )
         if not value
     ]
     if blank_fields:
         raise ValueError(f"{filename} has blank fields: " + ", ".join(blank_fields))
-    if status not in VALID_STATUSES:
+    if metadata.status not in VALID_STATUSES:
         raise ValueError(
-            f"{filename} has unrecognized status {status!r}; "
+            f"{filename} has unrecognized status {metadata.status!r}; "
             f"expected one of: {', '.join(status for status, _ in STATUS_DEFINITIONS)}"
         )
-
-    identifier = filename_match.group(1)
-    if title_match.group(1) != identifier:
+    if metadata.identifier != filename_match.group(1):
         raise ValueError(f"{filename} title number does not match filename")
 
+
+def parse_adr(filename, content):
+    metadata = parse_adr_metadata(filename, content)
+    validate_adr_metadata(filename, metadata)
+
     return AdrRecord(
-        identifier=identifier,
+        identifier=metadata.identifier,
         filename=filename,
-        title=title,
-        status=status,
-        summary=summary,
+        title=metadata.title,
+        status=metadata.status,
+        summary=metadata.summary,
     )
 
 
