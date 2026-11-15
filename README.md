@@ -128,6 +128,17 @@ All configuration is managed through the `.env` file. See `.env.example` for all
 
 ## Development Commands
 
+### Architecture Decision Records
+
+When adding an ADR or changing its status or summary, follow the
+[ADR contribution instructions](docs/adr/README.md) and regenerate the catalog:
+
+```bash
+python3 scripts/adr_catalog/generate_adr_catalog.py
+```
+
+CI checks that the generated catalog is up to date.
+
 ### View Service Status
 
 ```bash
